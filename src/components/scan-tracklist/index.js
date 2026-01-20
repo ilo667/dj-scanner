@@ -9,7 +9,7 @@ export default function ScanTracklist() {
                           border-gray-400 pb-2 ps-4 pt-3 text-gray-900 placeholder-light-gray outline-none"
                 ></textarea>
                 <button
-                    className="w-full rounded-[6px] bg-[#0057b7] p-4 text-center font-semibold text-white hover:bg-[#004590] mt-4"
+                    className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#004590] mt-4"
                     type="submit"
                 >
                     <span className="inline-block w-full">Scan playlist</span></button>
