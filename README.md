@@ -9,3 +9,6 @@ Start react - npm start
 
 https://vercel.com/docs/frameworks/backend/express
 https://vercel.com/docs/cli/build
+
+Deploy starts automatically - push to git
+git push -u origin main
