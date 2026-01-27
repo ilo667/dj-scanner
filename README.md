@@ -12,3 +12,7 @@ https://vercel.com/docs/cli/build
 
 Deploy starts automatically - push to git
 git push -u origin main
+
+Debug backend
+node --inspect api/index.ts
+chrome://inspect
