@@ -14,34 +14,57 @@ export default function ScanTracklist() {
         setLoading(true);
 
         try {
-            let res;
+            let response;
 
             if (file) {
                 const formData = new FormData();
 
                 formData.append('file', file);
 
-                res = await fetch('/api/parse-file', {
+                response = await fetch('/api/parse-file', {
                     method: 'POST',
                     body: formData
                 });
             } else {
-                res = await fetch('/api/check', {
+                response = await fetch('/api/check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ trackList: trackListInput.trim() })
                 });
             }
 
-            const data = await res.json();
+            const data = await response.json();
+            const artists = await checkArtists(data.artists);
 
-            setArtists(data.artists);
+            setArtists(artists);
             setFile(null);
             setTrackListInput('');
         } catch (err) {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function checkArtists(artists) {
+        try {
+            const response = await fetch('/api/artists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    artists
+                })
+            });
+
+            const data = await response.json();
+
+            return artists.map(artistName => ({
+                name: artistName,
+                highlight: data.found.includes(artistName)
+            }));
+        } catch (err) {
+            console.error(err);
+            return [];
         }
     }
 
@@ -57,6 +80,21 @@ export default function ScanTracklist() {
                               value={trackListInput}
                               onChange={(e) => setTrackListInput(e.target.value)}
                     ></textarea>
+                    <span>
+                        <strong>Format:</strong>
+                        <br/>
+                        01. Artist - Track
+                        <br/>
+                        02. Artist - Track
+                        <br/>
+                        <strong>or</strong>
+                        <br/>
+                        Artist - Track
+                        <br/>
+                        Artist - Track
+                        <br/>
+                    </span>
+                    <br/>
                     <span>Or attach File</span>
                     <input
                         type="file"
@@ -81,7 +119,15 @@ export default function ScanTracklist() {
                     <h2 className="text-xl font-semibold mb-3">Artists found:</h2>
                     <ul className="list-disc pl-6">
                         {artists.map((artist, index) => (
-                            <li key={index}>{artist}</li>
+                            <li key={index}
+                                style={{
+                                    color: artist.highlight ? '#ff0000' : '#000000',
+                                    fontWeight: artist.highlight ? '700' : '400',
+                                }}
+                            >
+                                {artist.name}
+                                {artist.highlight && ' - remove from playlist!'}
+                            </li>
                         ))}
                     </ul>
                     <button
