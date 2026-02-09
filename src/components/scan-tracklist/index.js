@@ -1,4 +1,5 @@
 import React from 'react';
+import { ocrImageToText } from '../../utils/ocr';
 
 export default function ScanTracklist() {
     const [trackListInput, setTrackListInput] = React.useState('');
@@ -18,35 +19,6 @@ export default function ScanTracklist() {
             }
         };
     }, [previewUrl]);
-
-    async function ocrImageToText(imageFile) {
-        let result = '';
-
-        try {
-            const formData = new FormData();
-
-            formData.append('image', imageFile);
-
-            const response = await fetch('/api/ocr', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            result = data.response.data.text;
-
-            setTrackListInput(result);
-            setFile(null);
-            setConfirmTrackList(true);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-
-        return result;
-    }
 
     function onPaste(e) {
         const item = [...(e.clipboardData?.items || [])].find(i => i.type.includes('image'));
@@ -186,7 +158,12 @@ export default function ScanTracklist() {
                             <button
                                 className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#00438e] mt-4"
                                 type="button"
-                                onClick={() => ocrImageToText(file)}
+                                onClick={async () => {
+                                    const text = await ocrImageToText(file);
+                                    setTrackListInput(text);
+                                    setFile(null);
+                                    setConfirmTrackList(true);
+                                }}
                             >
                                 <span className="inline-block w-full">Read text from image</span>
                             </button>

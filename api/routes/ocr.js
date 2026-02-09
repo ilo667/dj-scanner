@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const multer = require('multer');
 // const OpenAI = require('openai'); //Todo: switch to OpenAI in future
-const { createWorker } = require('tesseract.js');
 
 const router = Router();
 
@@ -20,11 +19,6 @@ router.post('/', upload.single('image'), async (req, res) => {
         if (!mime.startsWith('image/')) {
             return res.status(400).json({ error: 'File must be an image' });
         }
-
-        const worker = await createWorker('eng');
-        const response = await worker.recognize(req.file.buffer);
-
-        await worker.terminate();
 
         //Todo: switch to OpenAI in future
 
