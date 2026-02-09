@@ -6,6 +6,7 @@ export default function ScanTracklist() {
     const [file, setFile] = React.useState(null);
     const [artists, setArtists] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const [parsing, setParsing] = React.useState(false);
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
     const previewUrl = React.useMemo(() => {
         if (!file || !file.type.startsWith('image/')) return null;
@@ -106,7 +107,7 @@ export default function ScanTracklist() {
                 <form className="w-2/3 m-auto" onSubmit={onSubmit}>
                     {!previewUrl && (
                         <div>
-                              <textarea rows="15"
+                              <textarea rows="12"
                                         cols="20"
                                         placeholder="Add tracklist or paste image screenshot"
                                         className="peer mt-4 block w-full appearance-none rounded-md border
@@ -132,7 +133,7 @@ export default function ScanTracklist() {
                                     </span>
                                     <br/>
                                     <span>Or attach File</span>
-                                    <input
+                                    <input className="w-full"
                                         type="file"
                                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     />
@@ -140,7 +141,7 @@ export default function ScanTracklist() {
                             )}
                         </div>
                     )}
-                    {previewUrl && (
+                    {previewUrl && !parsing && (
                         <div className="mt-4">
                             <img
                                 src={previewUrl}
@@ -159,10 +160,19 @@ export default function ScanTracklist() {
                                 className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#00438e] mt-4"
                                 type="button"
                                 onClick={async () => {
-                                    const text = await ocrImageToText(file);
-                                    setTrackListInput(text);
-                                    setFile(null);
-                                    setConfirmTrackList(true);
+                                    setParsing(true);
+
+                                    try {
+                                        const text = await ocrImageToText(file);
+
+                                        setTrackListInput(text);
+                                        setFile(null);
+                                        setConfirmTrackList(true);
+                                    } catch (err) {
+                                        console.error(err);
+                                    } finally {
+                                        setParsing(false);
+                                    }
                                 }}
                             >
                                 <span className="inline-block w-full">Read text from image</span>
@@ -183,6 +193,12 @@ export default function ScanTracklist() {
             {loading && (
                 <div className="text-center mt-6">
                     <p className="text-lg font-semibold">Scanning playlist...</p>
+                </div>
+            )}
+
+            {parsing && (
+                <div className="text-center mt-6">
+                    <p className="text-lg font-semibold">Reading text from image...</p>
                 </div>
             )}
 

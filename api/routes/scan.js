@@ -17,10 +17,9 @@ router.post('/', upload.single('file'), (req, res) => {
             text = req.file.buffer.toString('utf8');
         } else {
             text = (req.body?.trackList || '').toString();
-            // const artists = [...new Set(parseArtists(trackList))];
         }
 
-        const artists = parseArtists(text);//parseArtistsUnified
+        const artists = parseArtists(text);
 
         return res.json({
             success: true,

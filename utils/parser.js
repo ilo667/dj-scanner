@@ -1,7 +1,7 @@
-const TRACK_NUMBER_REGEX = /^\d+[\.\)]\s*/;
-const ARTIST_SEPARATOR_REGEX = /\s*(?:&|,|feat\.?|ft\.?)\s*/i;
+const TRACK_NUMBER_REGEX = /^\d+(?:\.\d+)*[\.\)]\s*/;
+const ARTIST_SEPARATOR_REGEX = /\s*(?:&|,|\b(?:feat|ft)\b\.?)\s*/i;
 const REMIX_REGEX = /\(([^()]+?)\s+Remix\)/i;
-const FEAT_REGEX = /\((?:feat\.?|ft\.?)\s+([^)]+)\)/i;
+const FEAT_REGEX = /\(\s*(?:\b(?:feat|ft)\b\.?)\s+([^)]+)\)/i;
 
 // remove spaces
 function normalizeLine(input) {
@@ -53,8 +53,8 @@ function extractArtistsFromTitle(title) {
 }
 
 /**
- * Parse one "track string" like:
- * "01. John B & Inja - Track Name (feat. MC XYZ) (ABC Remix)"
+ * Parse one "track line" like:
+ * "01. A & B - Track Name (feat. MC XYZ) (ABC Remix)"
  */
 function getArtistsFromTrackLine(trackLine) {
     const trackLineNormalized = removeTrackNumber(trackLine);

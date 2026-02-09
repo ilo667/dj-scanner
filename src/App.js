@@ -7,7 +7,7 @@ import NotFound from './components/not-found';
 
 export function App() {
     return (
-        <div className="min-h-screen pb-5 bg-[#ffd700]">
+        <div className="min-h-screen pb-10 bg-[#ffd700]">
             <Header />
             <Routes>
                 <Route index element={<Home />}/>
