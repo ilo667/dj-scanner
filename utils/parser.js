@@ -72,12 +72,61 @@ function getArtistsFromTrackLine(trackLine) {
 }
 
 /**
+ * Parse tab-separated tracklist from .txt file.
+ */
+function getTrackLinesFromTsvTable(text) {
+    const lines = (text || '').split(/\r?\n/).map(normalizeLine).filter(Boolean);
+
+    if (!lines.length) {
+        return null;
+    }
+
+    const header = lines[0].split('\t').map(normalizeLine);
+    const hasTrackTitle = header.some(h => /^track\s*title$/i.test(h));
+    const hasArtist = header.some(h => /^artist$/i.test(h));
+
+    if (!hasTrackTitle || !hasArtist) {
+        return null;
+    }
+
+    const titleIndex = header.findIndex(h => /^track\s*title$/i.test(h));
+    const artistIndex = header.findIndex(h => /^artist$/i.test(h));
+    const normalizedTrackLines = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split('\t');
+        const trackTitle = normalizeLine(row[titleIndex] || '');
+        const artist = normalizeLine(row[artistIndex] || '');
+
+        if (!trackTitle && !artist) {
+            continue;
+        }
+
+        // normalize into standard "Artist - Title" if Artist column exists
+        if (artist) {
+            normalizedTrackLines.push((artist + ' - ' + trackTitle).trim());
+        } else {
+            // fallback: sometimes title already contains "Artist - Title"
+            normalizedTrackLines.push(trackTitle);
+        }
+    }
+
+    return normalizedTrackLines;
+}
+
+/**
  * Extract "track lines" from input:
  * - If CUE => get TITLE and if needed combine PERFORMER + TITLE into "Performer - Title"
  * - Else => each non-empty line is a track string
  */
 function getTrackLines(input) {
     const text = input || '';
+    const tsvLines = getTrackLinesFromTsvTable(text);
+
+    if (tsvLines) {
+        return tsvLines;
+    }
+
     const isCueFormat = /\n\s*TRACK\s+\d+/i.test(text) || /^\s*TRACK\s+\d+/im.test(text);
 
     if (!isCueFormat) {

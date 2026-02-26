@@ -14,7 +14,7 @@ router.post('/', upload.single('file'), (req, res) => {
         let text = '';
 
         if (req.file) {
-            text = req.file.buffer.toString('utf8');
+            text = decodeBuffer(req.file.buffer);
         } else {
             text = (req.body?.trackList || '').toString();
         }
@@ -30,5 +30,20 @@ router.post('/', upload.single('file'), (req, res) => {
         res.status(500).json({ error: 'Failed to parse input' });
     }
 });
+
+function decodeBuffer(buffer) {
+    // UTF-16 LE BOM
+    if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
+        return buffer.toString('utf16le');
+    }
+
+    // UTF-16 BE BOM
+    if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
+        return buffer.toString('utf16le');
+    }
+
+    // default → UTF-8
+    return buffer.toString('utf8');
+}
 
 module.exports = router;
