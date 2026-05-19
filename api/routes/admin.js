@@ -42,7 +42,11 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
 
 router.delete('/artists/:id', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = parseInt(req.params.id, 10);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: 'Invalid artist ID' });
+        }
 
         const result = await pool.query('DELETE FROM artists WHERE id = $1', [id]);
 

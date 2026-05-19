@@ -2,7 +2,20 @@ const { Router } = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { isEmail } = require('validator');
+const rateLimit = require('express-rate-limit');
 const pool = require('../../utils/database');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: 'Too many login attempts. Please try again in 15 minutes.' }
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: { error: 'Too many registration attempts. Please try again in 1 hour.' }
+});
 
 const router = Router();
 
@@ -31,10 +44,10 @@ function setAuthCookies(res, user) {
     res.cookie('logged_in', JSON.stringify({ email: user.email, role: user.role }), HINT_COOKIE_OPTIONS);
 }
 
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
     try {
         const { email: rawEmail, password } = req.body;
-        const email = rawEmail?.toLowerCase();
+        const email = (rawEmail || '').toLowerCase().trim();
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
@@ -42,6 +55,10 @@ router.post('/register', async (req, res) => {
 
         if (!isEmail(email)) {
             return res.status(400).json({ error: 'Invalid email address' });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters' });
         }
 
         try {
@@ -53,10 +70,6 @@ router.post('/register', async (req, res) => {
             }
         } catch {
             // if Disify is unavailable — allow registration to proceed
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({ error: 'Password must be at least 8 characters' });
         }
 
         const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -83,10 +96,10 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { email: rawEmail, password } = req.body;
-        const email = rawEmail?.toLowerCase();
+        const email = (rawEmail || '').toLowerCase().trim();
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
