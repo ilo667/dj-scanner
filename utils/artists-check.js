@@ -15,11 +15,9 @@ async function checkArtists(artistNames) {
         `;
 
         const result = await pool.query(query, lowerNames);
-        const found = result.rows.map(row => row.name);
-        const foundLower = new Set(found.map(name => name.toLowerCase()));
-        const notFound = artistNames.filter(
-            name => !foundLower.has(name.toLowerCase())
-        );
+        const foundLower = new Set(result.rows.map(row => row.name.toLowerCase()));
+        const found = artistNames.filter(name => foundLower.has(name.toLowerCase()));
+        const notFound = artistNames.filter(name => !foundLower.has(name.toLowerCase()));
 
         return { found, notFound };
     } catch (error) {
