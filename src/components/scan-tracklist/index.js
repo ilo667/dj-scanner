@@ -113,6 +113,7 @@ export default function ScanTracklist() {
                         <div>
                               <textarea rows="12"
                                         cols="20"
+                                        aria-label="Tracklist"
                                         placeholder="Add tracklist or paste image screenshot"
                                         className="peer mt-4 block w-full appearance-none rounded-md border
                               border-gray-400 pb-2 ps-4 pt-3 text-gray-900 placeholder-light-gray outline-none validate"
@@ -139,6 +140,7 @@ export default function ScanTracklist() {
                                     <span>Or attach File</span>
                                     <input className="w-full"
                                         type="file"
+                                        aria-label="Upload tracklist file"
                                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     />
                                 </>
@@ -198,21 +200,14 @@ export default function ScanTracklist() {
 
             {error && (
                 <div className="w-2/3 m-auto mt-4">
-                    <p className="text-red-600 font-medium">{error}</p>
+                    <p role="alert" className="text-red-600 font-medium">{error}</p>
                 </div>
             )}
 
-            {loading && (
-                <div className="text-center mt-6">
-                    <p className="text-lg font-semibold">Scanning playlist...</p>
-                </div>
-            )}
-
-            {parsing && (
-                <div className="text-center mt-6">
-                    <p className="text-lg font-semibold">Reading text from image...</p>
-                </div>
-            )}
+            <div aria-live="polite" className="text-center mt-6">
+                {loading && <p className="text-lg font-semibold">Scanning playlist...</p>}
+                {parsing && <p className="text-lg font-semibold">Reading text from image...</p>}
+            </div>
 
             {artists.length > 0 && !loading && (
                 <div className="w-2/3 m-auto mt-6 p-4">
