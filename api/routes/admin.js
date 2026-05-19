@@ -1,10 +1,10 @@
 const { Router } = require('express');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireRole } = require('../middleware/auth');
 const pool = require('../../utils/database');
 
 const router = Router();
 
-router.get('/artists', requireAuth, async (req, res) => {
+router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
         const result = await pool.query('SELECT id, name FROM artists ORDER BY name ASC');
         return res.json({ artists: result.rows });
@@ -14,7 +14,7 @@ router.get('/artists', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/artists', requireAuth, async (req, res) => {
+router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -40,7 +40,7 @@ router.post('/artists', requireAuth, async (req, res) => {
     }
 });
 
-router.delete('/artists/:id', requireAuth, async (req, res) => {
+router.delete('/artists/:id', requireAuth, requireRole('admin'), async (req, res) => {
     try {
         const { id } = req.params;
 

@@ -15,6 +15,12 @@ export default function Admin() {
             navigate('/login');
             return;
         }
+
+        if (user.role !== 'admin') {
+            navigate('/');
+            return;
+        }
+
         fetchArtists();
     }, [user]);
 
