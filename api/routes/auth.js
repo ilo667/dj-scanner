@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { isEmail } = require('validator');
 const pool = require('../../utils/database');
 
 const router = Router();
@@ -32,13 +33,26 @@ function setAuthCookies(res, user) {
 
 router.post('/register', async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        // TODO: validate email format (e.g. with regex or validator library)
-        // TODO: normalize email to lowercase before saving and querying
+        const { email: rawEmail, password } = req.body;
+        const email = rawEmail?.toLowerCase();
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        if (!isEmail(email)) {
+            return res.status(400).json({ error: 'Invalid email address' });
+        }
+
+        try {
+            const disifyRes = await fetch(`https://www.disify.com/api/email/${encodeURIComponent(email)}`);
+            const disifyData = await disifyRes.json();
+
+            if (disifyData.disposable) {
+                return res.status(400).json({ error: 'Disposable email addresses are not allowed' });
+            }
+        } catch {
+            // if Disify is unavailable — allow registration to proceed
         }
 
         if (password.length < 8) {
@@ -71,7 +85,8 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email: rawEmail, password } = req.body;
+        const email = rawEmail?.toLowerCase();
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });

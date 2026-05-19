@@ -28,7 +28,8 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "^5.0.1",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
+    "validator": "^13.15.35"
   },
   "browserslist": {
     "production": [
