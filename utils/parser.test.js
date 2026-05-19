@@ -1,0 +1,128 @@
+const { test, describe } = require('node:test');
+const assert = require('node:assert/strict');
+const { parseArtists } = require('./parser');
+
+describe('plain text format', () => {
+    test('Artist - Track', () => {
+        assert.deepEqual(parseArtists('Artist One - Track Name'), ['Artist One']);
+    });
+
+    test('01. Artist - Track', () => {
+        assert.deepEqual(parseArtists('01. Artist One - Track Name'), ['Artist One']);
+    });
+
+    test('1) Artist - Track', () => {
+        assert.deepEqual(parseArtists('1) Artist One - Track Name'), ['Artist One']);
+    });
+
+    test('multiple lines', () => {
+        const input = 'Artist One - Track\nArtist Two - Track';
+        assert.deepEqual(parseArtists(input), ['Artist One', 'Artist Two']);
+    });
+
+    test('deduplication', () => {
+        const input = 'Artist One - Track\nArtist One - Another Track';
+        assert.deepEqual(parseArtists('Artist One - Track\nArtist One - Another Track'), ['Artist One']);
+    });
+
+    test('empty input returns empty array', () => {
+        assert.deepEqual(parseArtists(''), []);
+    });
+});
+
+describe('multiple artists', () => {
+    test('A & B - Track', () => {
+        const result = parseArtists('Artist A & Artist B - Track');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('A, B - Track', () => {
+        const result = parseArtists('Artist A, Artist B - Track');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('A feat. B - Track', () => {
+        const result = parseArtists('Artist A feat. Artist B - Track');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('A ft. B - Track', () => {
+        const result = parseArtists('Artist A ft. Artist B - Track');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+});
+
+describe('feat in title', () => {
+    test('Track (feat. Guest)', () => {
+        const result = parseArtists('Artist - Track (feat. Guest Artist)');
+        assert.ok(result.includes('Artist'));
+        assert.ok(result.includes('Guest Artist'));
+    });
+
+    test('Track (ft. Guest)', () => {
+        const result = parseArtists('Artist - Track (ft. Guest Artist)');
+        assert.ok(result.includes('Artist'));
+        assert.ok(result.includes('Guest Artist'));
+    });
+
+    test('feat multiple guests', () => {
+        const result = parseArtists('Artist - Track (feat. Guest A & Guest B)');
+        assert.ok(result.includes('Guest A'));
+        assert.ok(result.includes('Guest B'));
+    });
+});
+
+describe('remix in title', () => {
+    test('Track (Remixer Remix)', () => {
+        const result = parseArtists('Artist - Track (Remixer Remix)');
+        assert.ok(result.includes('Artist'));
+        assert.ok(result.includes('Remixer'));
+    });
+});
+
+describe('CUE format', () => {
+    test('PERFORMER + TITLE', () => {
+        const input = `
+TRACK 01 AUDIO
+  TITLE "Track Name"
+  PERFORMER "Artist One"
+TRACK 02 AUDIO
+  TITLE "Another Track"
+  PERFORMER "Artist Two"
+        `.trim();
+        const result = parseArtists(input);
+        assert.ok(result.includes('Artist One'));
+        assert.ok(result.includes('Artist Two'));
+    });
+
+    test('TITLE with "Artist - Track" format', () => {
+        const input = `
+TRACK 01 AUDIO
+  TITLE "Artist One - Track Name"
+TRACK 02 AUDIO
+  TITLE "Artist Two - Another Track"
+        `.trim();
+        const result = parseArtists(input);
+        assert.ok(result.includes('Artist One'));
+        assert.ok(result.includes('Artist Two'));
+    });
+});
+
+describe('TSV format (Beatport export)', () => {
+    test('tab-separated with Track Title and Artist columns', () => {
+        const input = [
+            '#\tTrack Title\tArtist\tBPM',
+            '1\tTrack Name\tArtist One\t128',
+            '2\tAnother Track\tArtist Two\t130',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('Artist One'));
+        assert.ok(result.includes('Artist Two'));
+    });
+
+    test('returns empty if no Track Title column', () => {
+        const input = '#\tName\tArtist\n1\tTrack\tArtist One';
+        const result = parseArtists(input);
+        assert.equal(result.length, 0);
+    });
+});

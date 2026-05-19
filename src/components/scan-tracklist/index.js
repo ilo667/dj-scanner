@@ -8,6 +8,7 @@ export default function ScanTracklist() {
     const [loading, setLoading] = React.useState(false);
     const [parsing, setParsing] = React.useState(false);
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
+    const [error, setError] = React.useState(null);
     const previewUrl = React.useMemo(() => {
         if (!file || !file.type.startsWith('image/')) return null;
         return URL.createObjectURL(file);
@@ -43,6 +44,7 @@ export default function ScanTracklist() {
         if (!trackListInput.trim() && !file) return;
 
         setLoading(true);
+        setError(null);
 
         try {
             let response;
@@ -74,6 +76,7 @@ export default function ScanTracklist() {
             setConfirmTrackList(false);
         } catch (err) {
             console.error(err);
+            setError('Something went wrong while scanning playlist. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -97,6 +100,7 @@ export default function ScanTracklist() {
             }));
         } catch (err) {
             console.error(err);
+            setError('Could not check artists against database. Please try again.');
             return [];
         }
     }
@@ -161,6 +165,7 @@ export default function ScanTracklist() {
                                 type="button"
                                 onClick={async () => {
                                     setParsing(true);
+                                    setError(null);
 
                                     try {
                                         const text = await ocrImageToText(file);
@@ -170,6 +175,7 @@ export default function ScanTracklist() {
                                         setConfirmTrackList(true);
                                     } catch (err) {
                                         console.error(err);
+                                        setError('Failed to read text from image. Please try again.');
                                     } finally {
                                         setParsing(false);
                                     }
@@ -188,6 +194,12 @@ export default function ScanTracklist() {
                         </button>
                     )}
                 </form>
+            )}
+
+            {error && (
+                <div className="w-2/3 m-auto mt-4">
+                    <p className="text-red-600 font-medium">{error}</p>
+                </div>
             )}
 
             {loading && (
@@ -224,6 +236,7 @@ export default function ScanTracklist() {
                             setArtists([]);
                             setTrackListInput('');
                             setConfirmTrackList(false);
+                            setError(null);
                         }}
                     >
                         Scan another playlist
