@@ -1,5 +1,13 @@
 require('dotenv').config();
 
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+}
+
+if (!process.env.POSTGRES_URL) {
+    throw new Error('POSTGRES_URL environment variable is required');
+}
+
 const express = require('express');
 const bodyParser = require('body-parser'); // TODO: replace with express.json() and remove body-parser dependency
 const cookieParser = require('cookie-parser');
