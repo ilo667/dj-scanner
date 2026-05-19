@@ -127,7 +127,7 @@ export default function ScanTracklist() {
                             {!confirmTrackList && (
                                 <>
                                     <span>
-                                        <strong>Format:</strong>
+                                        <strong>Text format:</strong>
                                         <br/>
                                         01. Artist - Track
                                         <br/>
@@ -143,6 +143,15 @@ export default function ScanTracklist() {
                                         aria-label="Upload tracklist file"
                                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     />
+                                    <div className="mt-5">
+                                        <strong>Screenshot tips:</strong>
+                                        <ul className="list-disc pl-5">
+                                            <li>Use list view - one track per line</li>
+                                            <li>Make sure track names are not cut off</li>
+                                            <li>Clear font, good contrast (light on dark or dark on light)</li>
+                                            <li>No UI elements overlapping the text</li>
+                                        </ul>
+                                    </div>
                                 </>
                             )}
                         </div>
