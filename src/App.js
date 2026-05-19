@@ -1,7 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/home';
 import Login from './components/account/login';
+import Register from './components/account/register';
 import ScanTracklist from './components/scan-tracklist';
+import Admin from './components/admin';
 import Header from './components/header';
 import NotFound from './components/not-found';
 
@@ -12,7 +14,9 @@ export function App() {
             <Routes>
                 <Route index element={<Home />}/>
                 <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
                 <Route path="scan" element={<ScanTracklist />} />
+                <Route path="admin" element={<Admin />} />{/* TODO: replace with ProtectedRoute component when more protected pages are added */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </div>
