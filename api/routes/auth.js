@@ -74,12 +74,6 @@ router.post('/register', registerLimiter, async (req, res) => {
             // if Disify is unavailable — allow registration to proceed
         }
 
-        const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-
-        if (existing.rows.length > 0) {
-            return res.status(400).json({ error: 'Registration failed. Please try a different email or log in.' });
-        }
-
         const password_hash = await bcrypt.hash(password, 10);
 
         const inserted = await pool.query(
@@ -93,6 +87,9 @@ router.post('/register', registerLimiter, async (req, res) => {
 
         return res.status(201).json({ success: true });
     } catch (error) {
+        if (error.code === '23505') {
+            return res.status(400).json({ error: 'Registration failed. Please try a different email or log in.' });
+        }
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
     }
