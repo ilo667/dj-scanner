@@ -81,7 +81,7 @@ export default function ScanTracklist() {
         }
     }
 
-return (
+    return (
         <div>
             {!artists.length && !loading && (
                 <form className="w-2/3 m-auto" onSubmit={onSubmit}>

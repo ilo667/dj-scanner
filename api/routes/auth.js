@@ -107,7 +107,7 @@ router.post('/login', loginLimiter, async (req, res) => {
             return res.status(400).json({ error: 'Email and password are required' });
         }
 
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const result = await pool.query('SELECT id, email, password_hash, role FROM users WHERE email = $1', [email]);
 
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
