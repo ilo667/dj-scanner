@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const multer = require('multer');
 const { parseArtists } = require('../../utils/parser');
+const { checkArtists } = require('../../utils/artists-check');
 
 const router = Router();
 
@@ -9,7 +10,7 @@ const upload = multer({
     limits: { fileSize: 2 * 1024 * 1024 } // 2MB
 });
 
-router.post('/', upload.single('file'), (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
     try {
         let text = '';
 
@@ -20,10 +21,11 @@ router.post('/', upload.single('file'), (req, res) => {
         }
 
         const artists = parseArtists(text);
+        const { found } = await checkArtists(artists);
 
         return res.json({
             success: true,
-            artists
+            artists: artists.map(name => ({ name, highlight: found.includes(name) }))
         });
     } catch (error) {
         console.error(error);
