@@ -62,7 +62,9 @@ router.post('/register', registerLimiter, async (req, res) => {
         }
 
         try {
-            const disifyRes = await fetch(`https://www.disify.com/api/email/${encodeURIComponent(email)}`);
+            const disifyRes = await fetch(`https://www.disify.com/api/email/${encodeURIComponent(email)}`, {
+                signal: AbortSignal.timeout(10000)
+            });
             const disifyData = await disifyRes.json();
 
             if (disifyData.disposable) {
