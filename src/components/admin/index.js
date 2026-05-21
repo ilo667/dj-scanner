@@ -55,8 +55,8 @@ export default function Admin() {
 
             if (!res.ok) throw new Error(data.error);
 
+            setArtists(prev => [...prev, data.artist].sort((a, b) => a.name.localeCompare(b.name)));
             setNewArtist('');
-            fetchArtists();
         } catch (err) {
             setError(err.message);
         }

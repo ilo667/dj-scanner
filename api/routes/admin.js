@@ -31,9 +31,11 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
             return res.status(400).json({ error: 'Artist already exists' });
         }
 
-        await pool.query('INSERT INTO artists (name) VALUES ($1)', [name.trim()]);
+        const result = await pool.query('INSERT INTO artists (name) VALUES ($1) RETURNING id, name', [name.trim()]);
 
-        return res.status(201).json({ success: true });
+        if (!result.rows[0]) throw new Error('Insert failed to return artist');
+
+        return res.status(201).json({ success: true, artist: result.rows[0] });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
