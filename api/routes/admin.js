@@ -22,21 +22,15 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
             return res.status(400).json({ error: 'Artist name is required' });
         }
 
-        const existing = await pool.query(
-            'SELECT name FROM artists WHERE LOWER(name) = $1',
-            [name.trim().toLowerCase()]
-        );
-
-        if (existing.rows.length > 0) {
-            return res.status(400).json({ error: 'Artist already exists' });
-        }
-
         const result = await pool.query('INSERT INTO artists (name) VALUES ($1) RETURNING id, name', [name.trim()]);
 
         if (!result.rows[0]) throw new Error('Insert failed to return artist');
 
         return res.status(201).json({ success: true, artist: result.rows[0] });
     } catch (error) {
+        if (error.code === '23505') {
+            return res.status(400).json({ error: 'Artist already exists' });
+        }
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
     }
