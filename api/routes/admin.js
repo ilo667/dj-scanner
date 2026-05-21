@@ -33,6 +33,8 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
 
         const result = await pool.query('INSERT INTO artists (name) VALUES ($1) RETURNING id, name', [name.trim()]);
 
+        if (!result.rows[0]) throw new Error('Insert failed to return artist');
+
         return res.status(201).json({ success: true, artist: result.rows[0] });
     } catch (error) {
         console.error(error);
