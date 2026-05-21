@@ -68,9 +68,8 @@ export default function ScanTracklist() {
             }
 
             const data = await response.json();
-            const artists = await checkArtists(data.artists);
 
-            setArtists(artists);
+            setArtists(data.artists);
             setFile(null);
             setTrackListInput('');
             setConfirmTrackList(false);
@@ -82,30 +81,7 @@ export default function ScanTracklist() {
         }
     }
 
-    async function checkArtists(artists) {
-        try {
-            const response = await fetch('/api/artists', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    artists
-                })
-            });
-
-            const data = await response.json();
-
-            return artists.map(artistName => ({
-                name: artistName,
-                highlight: data.found.includes(artistName)
-            }));
-        } catch (err) {
-            console.error(err);
-            setError('Could not check artists against database. Please try again.');
-            return [];
-        }
-    }
-
-    return (
+return (
         <div>
             {!artists.length && !loading && (
                 <form className="w-2/3 m-auto" onSubmit={onSubmit}>
