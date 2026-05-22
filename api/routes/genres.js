@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { requireAuth, requireRole } = require('../middleware/auth');
 const { getGenres, createGenre, deleteGenre } = require('../../utils/genres');
 
 const router = Router();
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, requireRole('admin'), async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, requireRole('admin'), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
 

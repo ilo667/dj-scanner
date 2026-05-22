@@ -49,6 +49,7 @@ export default function AdminGenres() {
             const res = await fetch('/api/genres', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ name: newGenre.trim() })
             });
 
@@ -72,7 +73,7 @@ export default function AdminGenres() {
     async function deleteGenre(id) {
         setError(null);
         try {
-            const res = await fetch(`/api/genres/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/genres/${id}`, { method: 'DELETE', credentials: 'include' });
             if (!res.ok) throw new Error();
             setGenres(prev => prev.filter(g => g.id !== id));
         } catch {
