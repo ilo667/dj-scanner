@@ -15,6 +15,7 @@ const scanRoutes = require('./routes/scan');
 const artistsRoutes = require('./routes/artists');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const genresRoutes = require('./routes/genres');
 const app = express();
 
 app.set('port', (process.env.PORT || 8081));
@@ -24,6 +25,7 @@ app.use('/api/scan', scanRoutes);
 app.use('/api/artists', artistsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/genres', genresRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
 	const port = process.env.PORT || 8081;
