@@ -9,6 +9,7 @@ export default function Admin() {
     const [newArtist, setNewArtist] = React.useState('');
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
+    const [genres, setGenres] = React.useState([]);
 
     React.useEffect(() => {
         if (!user) {
@@ -22,6 +23,7 @@ export default function Admin() {
         }
 
         fetchArtists();
+        fetchGenres();
     }, [user]);
 
     async function fetchArtists() {
@@ -37,6 +39,14 @@ export default function Admin() {
         } finally {
             setLoading(false);
         }
+    }
+
+    async function fetchGenres() {
+        try {
+            const res = await fetch('/api/genres');
+            const data = await res.json();
+            setGenres(data);
+        } catch {}
     }
 
     async function addArtist(e) {
@@ -87,6 +97,16 @@ export default function Admin() {
         <div className="w-2/3 m-auto mt-10">
             <h1 className="text-2xl font-bold mb-6">Artists blacklist</h1>
 
+            {genres.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {genres.map(genre => (
+                        <div key={genre.id} className="px-4 py-1 rounded bg-[#0057b8] text-white text-sm cursor-pointer hover:bg-[#00438e]">
+                            {genre.name}
+                        </div>
+                    ))}
+                </div>
+            )}
+
             <form onSubmit={addArtist} className="flex gap-2 mb-8">
                 <input
                     type="text"
@@ -108,29 +128,17 @@ export default function Admin() {
             {error && <p role="alert" className="text-red-600 mb-4">{error}</p>}
 
             <ul className="divide-y divide-gray-200">
-                {/* TODO: move nameCounts to useMemo to avoid recalculating on every render */}
-                {(() => {
-                    const nameCounts = artists.reduce((acc, a) => {
-                        acc[a.name.toLowerCase()] = (acc[a.name.toLowerCase()] || 0) + 1;
-                        return acc;
-                    }, {});
-                    return artists.map(artist => (
-                        <li key={artist.id} className="flex items-center justify-between py-2">
-                            <span>{artist.name}</span>
-                            <span className="flex items-center gap-3">
-                                {nameCounts[artist.name.toLowerCase()] > 1 && (
-                                    <span className="text-xs text-[#0057b8] underline font-medium">duplicate</span>
-                                )}
-                                <button
-                                    onClick={() => deleteArtist(artist.id)}
-                                    className="text-sm text-red-600 hover:underline"
-                                >
-                                    Delete
-                                </button>
-                            </span>
-                        </li>
-                    ));
-                })()}
+                {artists.map(artist => (
+                    <li key={artist.id} className="flex items-center justify-between py-2">
+                        <span>{artist.name}</span>
+                        <button
+                            onClick={() => deleteArtist(artist.id)}
+                            className="text-sm text-red-600 hover:underline"
+                        >
+                            Delete
+                        </button>
+                    </li>
+                ))}
             </ul>
 
             {!loading && artists.length === 0 && (
