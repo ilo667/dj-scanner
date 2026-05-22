@@ -8,6 +8,7 @@ export default function Admin() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [artists, setArtists] = React.useState([]);
     const [newArtist, setNewArtist] = React.useState('');
+    const [newArtistGenre, setNewArtistGenre] = React.useState('');
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
     const [genres, setGenres] = React.useState([]);
@@ -32,7 +33,12 @@ export default function Admin() {
         if (!genresLoaded) return;
 
         const dnb = genres.find(g => g.name === 'Drum & Bass');
+
         setDefaultFilters({ genre_id: dnb?.id ?? null });
+
+        const firstGenre = genres.find(g => g.name !== 'All Genres');
+
+        if (firstGenre) setNewArtistGenre(String(firstGenre.id));
     }, [genresLoaded]);
 
     React.useEffect(() => {
@@ -87,7 +93,7 @@ export default function Admin() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ name: newArtist })
+                body: JSON.stringify({ name: newArtist, genre_id: newArtistGenre ? parseInt(newArtistGenre) : null })
             });
 
             const data = await res.json();
@@ -96,6 +102,8 @@ export default function Admin() {
 
             setArtists(prev => [...prev, data.artist].sort((a, b) => a.name.localeCompare(b.name)));
             setNewArtist('');
+            const firstGenre = genres.find(g => g.name !== 'All Genres');
+            if (firstGenre) setNewArtistGenre(String(firstGenre.id));
         } catch (err) {
             setError(err.message);
         }
@@ -157,6 +165,22 @@ export default function Admin() {
                     value={newArtist}
                     onChange={e => setNewArtist(e.target.value)}
                 />
+                <div className="relative">
+                    <select
+                        value={newArtistGenre}
+                        onChange={e => setNewArtistGenre(e.target.value)}
+                        className="appearance-none rounded-md bg-green-700 text-white px-4 py-2 pr-8 outline-none cursor-pointer hover:bg-green-800"
+                    >
+                        {genres.filter(g => g.name !== 'All Genres').map(g => (
+                            <option key={g.id} value={g.id}>{g.name}</option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
                 <button
                     type="submit"
                     className="rounded-md bg-[#0057b8] px-6 py-2 font-semibold text-white hover:bg-[#00438e]"

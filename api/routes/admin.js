@@ -36,13 +36,16 @@ router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
 
 router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, genre_id } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({ error: 'Artist name is required' });
         }
 
-        const result = await pool.query('INSERT INTO artists (name) VALUES ($1) RETURNING id, name', [name.trim()]);
+        const result = await pool.query(
+            'INSERT INTO artists (name, genre_id) VALUES ($1, $2) RETURNING id, name',
+            [name.trim(), genre_id ?? null]
+        );
 
         if (!result.rows[0]) throw new Error('Insert failed to return artist');
 
