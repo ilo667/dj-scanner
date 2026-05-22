@@ -13,12 +13,19 @@ router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
         }
 
         const id = parseInt(genre_id, 10);
-        const genreCheck = await pool.query('SELECT name FROM genres WHERE id = $1', [id]);
-        const isAllGenres = genreCheck.rows[0]?.name === 'All Genres';
 
-        const result = isAllGenres
-            ? await pool.query('SELECT id, name FROM artists ORDER BY name ASC')
-            : await pool.query('SELECT id, name FROM artists WHERE genre_id = $1 ORDER BY name ASC', [id]);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid genre_id' });
+        }
+
+        const result = await pool.query(
+            `SELECT a.id, a.name
+             FROM artists a
+             JOIN genres g ON g.id = $1
+             WHERE g.name = 'All Genres' OR a.genre_id = g.id
+             ORDER BY a.name ASC`,
+            [id]
+        );
 
         return res.json({ artists: result.rows });
     } catch (error) {
