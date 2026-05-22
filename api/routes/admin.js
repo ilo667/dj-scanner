@@ -6,7 +6,27 @@ const router = Router();
 
 router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, name FROM artists ORDER BY name ASC');
+        const { genre_id } = req.query;
+
+        if (!genre_id) {
+            return res.status(400).json({ error: 'genre_id is required' });
+        }
+
+        const id = parseInt(genre_id, 10);
+
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid genre_id' });
+        }
+
+        const result = await pool.query(
+            `SELECT a.id, a.name
+             FROM artists a
+             JOIN genres g ON g.id = $1
+             WHERE g.name = 'All Genres' OR a.genre_id = g.id
+             ORDER BY a.name ASC`,
+            [id]
+        );
+
         return res.json({ artists: result.rows });
     } catch (error) {
         console.error(error);
@@ -16,13 +36,16 @@ router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
 
 router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, genre_id } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({ error: 'Artist name is required' });
         }
 
-        const result = await pool.query('INSERT INTO artists (name) VALUES ($1) RETURNING id, name', [name.trim()]);
+        const result = await pool.query(
+            'INSERT INTO artists (name, genre_id) VALUES ($1, $2) RETURNING id, name, genre_id',
+            [name.trim(), genre_id ?? null]
+        );
 
         if (!result.rows[0]) throw new Error('Insert failed to return artist');
 
