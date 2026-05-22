@@ -1,15 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/auth';
 
 export default function Admin() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [artists, setArtists] = React.useState([]);
     const [newArtist, setNewArtist] = React.useState('');
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
     const [genres, setGenres] = React.useState([]);
+    const [genresLoaded, setGenresLoaded] = React.useState(false);
+    const [defaultFilters, setDefaultFilters] = React.useState(null);
 
     React.useEffect(() => {
         if (!user) {
@@ -22,13 +25,39 @@ export default function Admin() {
             return;
         }
 
-        fetchArtists();
         fetchGenres();
     }, [user]);
 
-    async function fetchArtists() {
+    React.useEffect(() => {
+        if (!genresLoaded) return;
+
+        const dnb = genres.find(g => g.name === 'Drum & Bass');
+        setDefaultFilters({ genre_id: dnb?.id ?? null });
+    }, [genresLoaded]);
+
+    React.useEffect(() => {
+        if (!defaultFilters) return;
+
+        const genreParam = searchParams.get('genre');
+        const genreId = genreParam ? parseInt(genreParam) : defaultFilters.genre_id;
+
+        fetchArtists(genreId);
+    }, [defaultFilters, searchParams]);
+
+    async function fetchGenres() {
         try {
-            const res = await fetch('/api/admin/artists', { credentials: 'include' });
+            const res = await fetch('/api/genres');
+            const data = await res.json();
+            setGenres(data);
+        } catch {} finally {
+            setGenresLoaded(true);
+        }
+    }
+
+    async function fetchArtists(genreId) {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/admin/artists?genre_id=${genreId}`, { credentials: 'include' });
 
             if (!res.ok) throw new Error();
             const data = await res.json();
@@ -41,12 +70,12 @@ export default function Admin() {
         }
     }
 
-    async function fetchGenres() {
-        try {
-            const res = await fetch('/api/genres');
-            const data = await res.json();
-            setGenres(data);
-        } catch {}
+    function handleChipClick(genre) {
+        if (genre.id === defaultFilters?.genre_id) {
+            setSearchParams({});
+        } else {
+            setSearchParams({ genre: genre.id });
+        }
     }
 
     async function addArtist(e) {
@@ -89,6 +118,9 @@ export default function Admin() {
         }
     }
 
+    const genreParam = searchParams.get('genre');
+    const selectedGenreId = genreParam ? parseInt(genreParam) : defaultFilters?.genre_id;
+
     if (loading) {
         return <div className="text-center mt-16">Loading...</div>;
     }
@@ -100,7 +132,15 @@ export default function Admin() {
             {genres.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                     {genres.map(genre => (
-                        <div key={genre.id} className="px-4 py-1 rounded bg-[#0057b8] text-white text-sm cursor-pointer hover:bg-[#00438e]">
+                        <div
+                            key={genre.id}
+                            onClick={() => handleChipClick(genre)}
+                            className={`px-4 py-1 rounded text-sm cursor-pointer ${
+                                genre.id === selectedGenreId
+                                    ? 'bg-[#00438e] text-white'
+                                    : 'bg-[#0057b8] text-white hover:bg-[#00438e]'
+                            }`}
+                        >
                             {genre.name}
                         </div>
                     ))}
@@ -142,7 +182,7 @@ export default function Admin() {
             </ul>
 
             {!loading && artists.length === 0 && (
-                <p className="text-gray-500 mt-4">No artists in blacklist yet.</p>
+                <p className="text-gray-500 mt-4">No artists in blacklist yet</p>
             )}
         </div>
     );

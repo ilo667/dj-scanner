@@ -6,7 +6,20 @@ const router = Router();
 
 router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, name FROM artists ORDER BY name ASC');
+        const { genre_id } = req.query;
+
+        if (!genre_id) {
+            return res.status(400).json({ error: 'genre_id is required' });
+        }
+
+        const id = parseInt(genre_id, 10);
+        const genreCheck = await pool.query('SELECT name FROM genres WHERE id = $1', [id]);
+        const isAllGenres = genreCheck.rows[0]?.name === 'All Genres';
+
+        const result = isAllGenres
+            ? await pool.query('SELECT id, name FROM artists ORDER BY name ASC')
+            : await pool.query('SELECT id, name FROM artists WHERE genre_id = $1 ORDER BY name ASC', [id]);
+
         return res.json({ artists: result.rows });
     } catch (error) {
         console.error(error);
