@@ -100,10 +100,13 @@ export default function Admin() {
 
             if (!res.ok) throw new Error(data.error);
 
-            setArtists(prev => [...prev, data.artist].sort((a, b) => a.name.localeCompare(b.name)));
+            const isAllGenres = genres.find(g => g.id === selectedGenreId)?.name === 'All Genres';
+
+            if (isAllGenres || data.artist.genre_id === selectedGenreId) {
+                setArtists(prev => [...prev, data.artist].sort((a, b) => a.name.localeCompare(b.name)));
+            }
+
             setNewArtist('');
-            const firstGenre = genres.find(g => g.name !== 'All Genres');
-            if (firstGenre) setNewArtistGenre(String(firstGenre.id));
         } catch (err) {
             setError(err.message);
         }

@@ -43,7 +43,7 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
         }
 
         const result = await pool.query(
-            'INSERT INTO artists (name, genre_id) VALUES ($1, $2) RETURNING id, name',
+            'INSERT INTO artists (name, genre_id) VALUES ($1, $2) RETURNING id, name, genre_id',
             [name.trim(), genre_id ?? null]
         );
 
