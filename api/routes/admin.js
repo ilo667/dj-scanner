@@ -4,7 +4,7 @@ const pool = require('../../utils/database');
 
 const router = Router();
 
-router.get('/artists', requireAuth, requireRole('admin'), async (req, res) => {
+router.get('/artists', requireAuth, async (req, res) => {
     try {
         const { genre_id } = req.query;
 
