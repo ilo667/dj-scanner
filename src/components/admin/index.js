@@ -21,11 +21,6 @@ export default function Admin() {
             return;
         }
 
-        if (user.role !== 'admin') {
-            navigate('/');
-            return;
-        }
-
         fetchGenres();
     }, [user]);
 
@@ -52,7 +47,7 @@ export default function Admin() {
 
     async function fetchGenres() {
         try {
-            const res = await fetch('/api/genres');
+            const res = await fetch('/api/genres', { credentials: 'include' });
             const data = await res.json();
             setGenres(data);
         } catch {} finally {
@@ -148,8 +143,8 @@ export default function Admin() {
                             onClick={() => handleChipClick(genre)}
                             className={`px-4 py-1 rounded text-sm cursor-pointer ${
                                 genre.id === selectedGenreId
-                                    ? 'bg-[#00438e] text-white'
-                                    : 'bg-[#0057b8] text-white hover:bg-[#00438e]'
+                                    ? 'bg-[#003580] text-white border-2 border-[#003580]'
+                                    : 'bg-yellow-300 text-[#003580] border-2 border-[#003580] hover:bg-[#0057b8] hover:text-white hover:border-[#0057b8]'
                             }`}
                         >
                             {genre.name}
@@ -158,7 +153,7 @@ export default function Admin() {
                 </div>
             )}
 
-            <form onSubmit={addArtist} className="flex gap-2 mb-8">
+            {user?.role === 'admin' && <form onSubmit={addArtist} className="flex gap-2 mb-8">
                 <input
                     type="text"
                     placeholder="Artist name"
@@ -190,7 +185,7 @@ export default function Admin() {
                 >
                     Add
                 </button>
-            </form>
+            </form>}
 
             {error && <p role="alert" className="text-red-600 mb-4">{error}</p>}
 
@@ -198,12 +193,14 @@ export default function Admin() {
                 {artists.map(artist => (
                     <li key={artist.id} className="flex items-center justify-between py-2">
                         <span>{artist.name}</span>
-                        <button
-                            onClick={() => deleteArtist(artist.id)}
-                            className="text-sm text-red-600 hover:underline"
-                        >
-                            Delete
-                        </button>
+                        {user?.role === 'admin' && (
+                            <button
+                                onClick={() => deleteArtist(artist.id)}
+                                className="text-sm text-red-600 hover:underline"
+                            >
+                                Delete
+                            </button>
+                        )}
                     </li>
                 ))}
             </ul>

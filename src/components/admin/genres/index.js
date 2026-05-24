@@ -27,7 +27,7 @@ export default function AdminGenres() {
 
     async function fetchGenres() {
         try {
-            const res = await fetch('/api/genres');
+            const res = await fetch('/api/genres', { credentials: 'include' });
             const data = await res.json();
 
             setGenres(data);

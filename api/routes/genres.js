@@ -4,7 +4,7 @@ const { getGenres, createGenre, deleteGenre } = require('../../utils/genres');
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
     try {
         const genres = await getGenres();
 

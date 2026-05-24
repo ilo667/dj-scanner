@@ -19,11 +19,9 @@ export default function Header() {
                 </li>
                 {user ? (
                     <>
-                        {user.role === 'admin' && (
-                            <li>
-                                <Link to="/admin">Admin</Link>
-                            </li>
-                        )}
+                        <li>
+                            <Link to="/admin">Admin</Link>
+                        </li>
                         <li>
                             <button onClick={onLogout} className="underline">
                                 Logout ({user.email})
