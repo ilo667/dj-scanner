@@ -2,11 +2,11 @@ const pool = require('./database');
 
 async function checkArtists(artistNames) {
     try {
-        const lowerNames = artistNames.map(name => name.toLowerCase());
-
         if (!artistNames || artistNames.length === 0) {
             return { found: [], notFound: [] };
         }
+
+        const lowerNames = artistNames.map(name => name.toLowerCase());
 
         const query = `
             SELECT name

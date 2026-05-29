@@ -9,7 +9,6 @@ if (!process.env.POSTGRES_URL) {
 }
 
 const express = require('express');
-const bodyParser = require('body-parser'); // TODO: replace with express.json() and remove body-parser dependency
 const cookieParser = require('cookie-parser');
 const scanRoutes = require('./routes/scan');
 const artistsRoutes = require('./routes/artists');
@@ -19,7 +18,7 @@ const genresRoutes = require('./routes/genres');
 const app = express();
 
 app.set('port', (process.env.PORT || 8081));
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 app.use('/api/scan', scanRoutes);
 app.use('/api/artists', artistsRoutes);

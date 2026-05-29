@@ -17,7 +17,7 @@ export function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="scan" element={<ScanTracklist />} />
-                <Route path="admin" element={<Admin />} />{/* TODO: replace with ProtectedRoute component when more protected pages are added */}
+                <Route path="admin" element={<Admin />} />
                 <Route path="admin/genres" element={<AdminGenres />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
