@@ -1,16 +1,23 @@
 const { Router } = require('express');
 const multer = require('multer');
+const rateLimit = require('express-rate-limit');
 const { parseArtists } = require('../../utils/parser');
 const { checkArtists } = require('../../utils/artists-check');
 
 const router = Router();
+
+const scanLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 50,
+    message: { error: 'Too many scan requests. Please try again in 15 minutes.' }
+});
 
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 2 * 1024 * 1024 } // 2MB
 });
 
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', scanLimiter, upload.single('file'), async (req, res) => {
     try {
         let text = '';
 
