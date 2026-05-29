@@ -108,6 +108,8 @@ export default function Admin() {
     }
 
     async function deleteArtist(id) {
+        if (!window.confirm('Delete artist?')) return;
+
         setError(null);
 
         try {
