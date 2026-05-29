@@ -71,7 +71,10 @@ export default function AdminGenres() {
     }
 
     async function deleteGenre(id) {
+        if (!window.confirm('Delete genre?')) return;
+
         setError(null);
+
         try {
             const res = await fetch(`/api/genres/${id}`, { method: 'DELETE', credentials: 'include' });
             if (!res.ok) throw new Error();
