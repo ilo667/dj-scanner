@@ -23,21 +23,21 @@ const COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 3 * 24 * 60 * 60 * 1000
 };
 
 const HINT_COOKIE_OPTIONS = {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 3 * 24 * 60 * 60 * 1000
 };
 
 function setAuthCookies(res, user) {
     const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: '3d' }
     );
 
     res.cookie('token', token, COOKIE_OPTIONS);
