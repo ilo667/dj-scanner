@@ -67,6 +67,16 @@ export default function ScanTracklist() {
                 });
             }
 
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+
+                setError(response.status === 429
+                    ? (errData.error || 'Too many scan requests. Please try again in 15 minutes.')
+                    : (errData.error || 'Something went wrong while scanning playlist. Please try again.')
+                );
+                return;
+            }
+
             const data = await response.json();
 
             setArtists(data.artists);
