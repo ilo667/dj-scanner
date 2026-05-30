@@ -209,14 +209,20 @@ export default function ScanTracklist() {
                     <h2 className="text-xl font-semibold mb-3">Artists found:</h2>
                     <ul className="list-disc pl-6">
                         {artists.map((artist, index) => (
-                            <li key={index}
-                                style={{
-                                    color: artist.highlight ? '#ff0000' : '#000000',
-                                    fontWeight: artist.highlight ? '700' : '400',
-                                }}
-                            >
-                                {artist.name}
-                                {artist.highlight && ' - remove from playlist!'}
+                            <li key={index} className="py-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span style={{ color: artist.blacklisted ? '#ff0000' : '#000000', fontWeight: artist.blacklisted ? '700' : '400' }}>
+                                        {artist.name}
+                                        {artist.countries.length > 0 && (
+                                            <span className="text-[10px] font-normal ml-1" style={{ color: artist.blacklisted ? '#ff0000' : '#555555' }}>
+                                                ({artist.countries.join(', ')})
+                                            </span>
+                                        )}
+                                    </span>
+                                    {artist.blacklisted && (
+                                        <span className="text-red-600">- remove from playlist!</span>
+                                    )}
+                                </div>
                             </li>
                         ))}
                     </ul>

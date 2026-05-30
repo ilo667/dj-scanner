@@ -14,6 +14,8 @@ export default function Admin() {
     const [genres, setGenres] = React.useState([]);
     const [genresLoaded, setGenresLoaded] = React.useState(false);
     const [defaultFilters, setDefaultFilters] = React.useState(null);
+    const [countries, setCountries] = React.useState([]);
+    const [newArtistCountries, setNewArtistCountries] = React.useState(['141']);
 
     React.useEffect(() => {
         if (!user) {
@@ -22,6 +24,7 @@ export default function Admin() {
         }
 
         fetchGenres();
+        fetchCountries();
     }, [user]);
 
     React.useEffect(() => {
@@ -45,10 +48,20 @@ export default function Admin() {
         fetchArtists(genreId);
     }, [defaultFilters, searchParams]);
 
+    async function fetchCountries() {
+        try {
+            const res = await fetch('/api/countries', { credentials: 'include' });
+            const data = await res.json();
+
+            setCountries(data);
+        } catch {}
+    }
+
     async function fetchGenres() {
         try {
             const res = await fetch('/api/genres', { credentials: 'include' });
             const data = await res.json();
+
             setGenres(data);
         } catch {} finally {
             setGenresLoaded(true);
@@ -61,6 +74,7 @@ export default function Admin() {
             const res = await fetch(`/api/admin/artists?genre_id=${genreId}`, { credentials: 'include' });
 
             if (!res.ok) throw new Error();
+
             const data = await res.json();
 
             setArtists(data.artists);
@@ -88,7 +102,12 @@ export default function Admin() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ name: newArtist, genre_id: newArtistGenre ? parseInt(newArtistGenre) : null })
+                body: JSON.stringify({
+                    name: newArtist,
+                    genre_id: newArtistGenre ? parseInt(newArtistGenre) : null,
+                    is_blacklisted: true,
+                    country_ids: newArtistCountries.map(Number)
+                })
             });
 
             const data = await res.json();
@@ -102,6 +121,7 @@ export default function Admin() {
             }
 
             setNewArtist('');
+            setNewArtistCountries(['141']);
         } catch (err) {
             setError(err.message);
         }
@@ -155,13 +175,13 @@ export default function Admin() {
                 </div>
             )}
 
-            {user?.role === 'admin' && <form onSubmit={addArtist} className="flex gap-2 mb-8">
+            {user?.role === 'admin' && <form onSubmit={addArtist} className="flex flex-wrap gap-2 mb-8 items-center">
                 <input
                     type="text"
                     placeholder="Artist name"
                     aria-label="Artist name"
                     required
-                    className="flex-1 rounded-md border border-gray-400 px-4 py-2 outline-none"
+                    className="flex-1 min-w-[200px] rounded-md border border-gray-400 px-4 py-2 outline-none"
                     value={newArtist}
                     onChange={e => setNewArtist(e.target.value)}
                 />
@@ -181,6 +201,18 @@ export default function Admin() {
                         </svg>
                     </div>
                 </div>
+                <select
+                    multiple
+                    size={2}
+                    value={newArtistCountries}
+                    onChange={e => setNewArtistCountries(Array.from(e.target.selectedOptions, o => o.value))}
+                    className="rounded-md border border-gray-400 px-4 py-2 outline-none"
+                >
+                    <option value="141">Russia</option>
+                    {countries.filter(c => c.id !== 141).map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                </select>
                 <button
                     type="submit"
                     className="rounded-md bg-[#0057b8] px-6 py-2 font-semibold text-white hover:bg-[#00438e]"

@@ -28,11 +28,16 @@ router.post('/', scanLimiter, upload.single('file'), async (req, res) => {
         }
 
         const artists = parseArtists(text);
-        const { found } = await checkArtists(artists);
+        const { found, artistCountries, artistBlacklisted } = await checkArtists(artists);
 
         return res.json({
             success: true,
-            artists: artists.map(name => ({ name, highlight: found.includes(name) }))
+            artists: artists.map(name => ({
+                name,
+                highlight: found.includes(name),
+                blacklisted: artistBlacklisted[name.toLowerCase()] ?? false,
+                countries: artistCountries[name.toLowerCase()] || []
+            }))
         });
     } catch (error) {
         console.error(error);
