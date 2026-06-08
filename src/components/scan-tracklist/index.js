@@ -160,6 +160,7 @@ export default function ScanTracklist() {
                                     <br/>
                                     <input type="file"
                                         aria-label="Upload tracklist file"
+                                        className="w-full md:w-auto"
                                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     />
                                     <div className="mt-5">
