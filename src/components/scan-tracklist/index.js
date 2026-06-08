@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ocrImageToText } from '../../utils/ocr';
 
 export default function ScanTracklist() {
@@ -9,6 +10,18 @@ export default function ScanTracklist() {
     const [parsing, setParsing] = React.useState(false);
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
     const [error, setError] = React.useState(null);
+    const [spotifyGuideOpen, setSpotifyGuideOpen] = React.useState(false);
+    const location = useLocation();
+
+    React.useEffect(() => {
+        setArtists([]);
+        setTrackListInput('');
+        setFile(null);
+        setError(null);
+        setConfirmTrackList(false);
+        setSpotifyGuideOpen(false);
+    }, [location.key]);
+
     const previewUrl = React.useMemo(() => {
         if (!file || !file.type.startsWith('image/')) return null;
         return URL.createObjectURL(file);
@@ -97,6 +110,26 @@ export default function ScanTracklist() {
                 <form className="w-2/3 m-auto" onSubmit={onSubmit}>
                     {!previewUrl && (
                         <div>
+                            <div className="mt-4 mb-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setSpotifyGuideOpen(h => !h)}
+                                    className="rounded-md bg-[#1DB954] px-4 py-2 font-semibold text-white hover:bg-[#17a349]"
+                                >
+                                    Scan Spotify
+                                </button>
+                                {spotifyGuideOpen && (
+                                    <div className="mt-3 rounded-md border border-gray-300 bg-gray-50 p-4 text-sm">
+                                        <ol className="list-decimal pl-5 space-y-1">
+                                            <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
+                                            <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
+                                            <li>Знайди потрібний плейлист в списку</li>
+                                            <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
+                                            <li>Прикріпи його нижче через <strong>Attach File</strong></li>
+                                        </ol>
+                                    </div>
+                                )}
+                            </div>
                               <textarea rows="12"
                                         cols="20"
                                         aria-label="Tracklist"
@@ -123,9 +156,9 @@ export default function ScanTracklist() {
                                         <br/>
                                     </span>
                                     <br/>
-                                    <span>Or attach File</span>
-                                    <input className="w-full"
-                                        type="file"
+                                    <span>Or <strong>Attach File</strong></span>
+                                    <br/>
+                                    <input type="file"
                                         aria-label="Upload tracklist file"
                                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     />

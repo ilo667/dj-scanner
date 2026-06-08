@@ -72,7 +72,60 @@ function getArtistsFromTrackLine(trackLine) {
 }
 
 /**
- * Parse tab-separated tracklist from .txt file.
+ * Split a single CSV row into fields, respecting quoted values
+ */
+function parseCsvRow(row) {
+    const fields = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+
+        if (ch === '"') {
+            inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+            fields.push(current);
+            current = '';
+        } else {
+            current += ch;
+        }
+    }
+
+    fields.push(current);
+    return fields;
+}
+
+/**
+ * Parse Spotify CSV exported from exportify.net
+ * Detects header with "Artist Name(s)" column, splits artists by ";"
+ */
+function getArtistsFromSpotifyCsv(text) {
+    const lines = (text || '').split(/\r?\n/).map(normalizeLine).filter(Boolean);
+
+    if (!lines.length) return null;
+
+    const header = parseCsvRow(lines[0]);
+    const artistIndex = header.findIndex(h => h.trim() === 'Artist Name(s)');
+
+    if (artistIndex === -1) return null;
+
+    const artists = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const row = parseCsvRow(lines[i]);
+        const cell = normalizeLine(row[artistIndex] || '');
+
+        if (cell) {
+            artists.push(...cell.split(';').map(normalizeLine).filter(Boolean));
+        }
+    }
+
+    return artists;
+}
+
+/**
+ * Parse tab-separated tracklist from .txt file
  */
 function getTrackLinesFromTsvTable(text) {
     const lines = (text || '').split(/\r?\n/).map(normalizeLine).filter(Boolean);
@@ -189,6 +242,12 @@ function getTrackLines(input) {
  * One unified function for CUE + plain tracklist
  */
 function parseArtists(input) {
+    const spotifyArtists = getArtistsFromSpotifyCsv(input);
+
+    if (spotifyArtists) {
+        return [...new Set(spotifyArtists)];
+    }
+
     const trackLines = getTrackLines(input);
     const artists = trackLines.flatMap(getArtistsFromTrackLine);
 
