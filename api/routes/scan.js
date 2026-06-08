@@ -82,6 +82,8 @@ router.post('/youtube', scanLimiter, async (req, res) => {
     const apiKey = process.env.YOUTUBE_API_KEY;
     const artistSet = new Set();
     let pageToken = '';
+    let pageCount = 0;
+    const MAX_PAGES = 30;
 
     try {
         do {
@@ -119,7 +121,8 @@ router.post('/youtube', scanLimiter, async (req, res) => {
             }
 
             pageToken = data.nextPageToken || '';
-        } while (pageToken);
+            pageCount++;
+        } while (pageToken && pageCount < MAX_PAGES);
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to fetch YouTube playlist' });
