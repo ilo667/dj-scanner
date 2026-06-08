@@ -8,6 +8,10 @@ if (!process.env.POSTGRES_URL) {
     throw new Error('POSTGRES_URL environment variable is required');
 }
 
+if (!process.env.YOUTUBE_API_KEY) {
+    throw new Error('YOUTUBE_API_KEY environment variable is required');
+}
+
 const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
