@@ -9,7 +9,8 @@ export default function Home() {
                 <li>Читання треклістів із <strong>CUE-файлів та TXT-експорту з Beatport</strong></li>
                 <li>Ручне введення треклістів через <strong>поле</strong></li>
                 <li>Розпізнавання тексту зі <strong>скріншотів і зображень</strong></li>
-                <li>Автоматичне визначення <strong>артистів</strong></li>
+                <li>Імпорт плейлистів із <strong>Spotify через Exportify CSV</strong> і сканування</li>
+                <li>Автоматичне визначення <strong>артистів та їх країн</strong></li>
                 <li>Швидка перевірка та <strong>фільтрація небажаних виконавців</strong></li>
                 <li>Перегляд і фільтрація виконавців за <strong>жанрами</strong> для залогінених користувачів</li>
             </ul>
