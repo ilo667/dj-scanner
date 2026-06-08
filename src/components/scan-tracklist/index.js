@@ -114,8 +114,9 @@ export default function ScanTracklist() {
                                 <button
                                     type="button"
                                     onClick={() => setSpotifyGuideOpen(h => !h)}
-                                    className="rounded-md bg-[#1DB954] px-4 py-2 font-semibold text-white hover:bg-[#17a349]"
+                                    className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
                                 >
+                                    <img src="/spotify-icon.svg" alt="" width="20" height="20" style={{ height: '20px' }} />
                                     Scan Spotify
                                 </button>
                                 {spotifyGuideOpen && (
