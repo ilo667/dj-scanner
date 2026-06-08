@@ -107,7 +107,6 @@ export default function Admin() {
                 body: JSON.stringify({
                     name: newArtist,
                     genre_id: newArtistGenre ? parseInt(newArtistGenre) : null,
-                    is_blacklisted: true,
                     country_ids: newArtistCountries.map(Number)
                 })
             });
