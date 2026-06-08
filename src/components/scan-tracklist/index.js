@@ -11,6 +11,8 @@ export default function ScanTracklist() {
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [spotifyGuideOpen, setSpotifyGuideOpen] = React.useState(false);
+    const [youtubeOpen, setYoutubeOpen] = React.useState(false);
+    const [youtubeUrl, setYoutubeUrl] = React.useState('');
     const location = useLocation();
 
     React.useEffect(() => {
@@ -20,6 +22,8 @@ export default function ScanTracklist() {
         setError(null);
         setConfirmTrackList(false);
         setSpotifyGuideOpen(false);
+        setYoutubeOpen(false);
+        setYoutubeUrl('');
     }, [location.key]);
 
     const previewUrl = React.useMemo(() => {
@@ -48,6 +52,40 @@ export default function ScanTracklist() {
 
         if (img) {
             setFile(img);
+        }
+    }
+
+    async function onYoutubeSubmit() {
+        if (!youtubeUrl.trim()) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('/api/scan/youtube', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: youtubeUrl.trim() })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(response.status === 429
+                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
+                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
+                );
+                return;
+            }
+
+            setArtists(data.artists);
+            setYoutubeUrl('');
+            setYoutubeOpen(false);
+        } catch (err) {
+            console.error(err);
+            setError('Something went wrong while scanning playlist. Please try again.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -110,26 +148,58 @@ export default function ScanTracklist() {
                 <form className="w-2/3 m-auto" onSubmit={onSubmit}>
                     {!previewUrl && (
                         <div>
-                            <div className="mt-4 mb-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setSpotifyGuideOpen(h => !h)}
-                                    className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
-                                >
-                                    <img src="/spotify-icon.svg" alt="" width="20" height="20" style={{ height: '20px' }} />
-                                    Scan Spotify
-                                </button>
-                                {spotifyGuideOpen && (
-                                    <div className="mt-3 rounded-md border border-gray-300 bg-gray-50 p-4 text-sm">
-                                        <ol className="list-decimal pl-5 space-y-1">
-                                            <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
-                                            <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
-                                            <li>Знайди потрібний плейлист в списку</li>
-                                            <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
-                                            <li>Прикріпи його нижче через <strong>Attach File</strong></li>
-                                        </ol>
-                                    </div>
-                                )}
+                            <div className="mt-4 mb-2 flex flex-wrap gap-3">
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); }}
+                                        className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
+                                    >
+                                        <img src="/spotify-icon.svg" alt="" width="20" height="20" style={{ height: '20px' }} />
+                                        Scan Spotify
+                                    </button>
+                                    {spotifyGuideOpen && (
+                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <ol className="list-decimal pl-5 space-y-1">
+                                                <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
+                                                <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
+                                                <li>Знайди потрібний плейлист в списку</li>
+                                                <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
+                                                <li>Прикріпи його нижче через <strong>Attach File</strong></li>
+                                            </ol>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); }}
+                                        className="inline-flex items-center gap-2 rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
+                                    >
+                                        <img src="/youtube-icon.png" alt="" style={{ height: '26px', width: 'auto', marginTop: '-1px', marginBottom: '-1px' }} />
+                                        Scan YouTube Music
+                                    </button>
+                                    {youtubeOpen && (
+                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={youtubeUrl}
+                                                    onChange={(e) => setYoutubeUrl(e.target.value)}
+                                                    placeholder="https://music.youtube.com/playlist?list=..."
+                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={onYoutubeSubmit}
+                                                    className="rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
+                                                >
+                                                    Scan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                               <textarea rows="12"
                                         cols="20"
@@ -250,7 +320,7 @@ export default function ScanTracklist() {
                                         {artist.name}
                                         {artist.countries.length > 0 && (
                                             <span className="text-[10px] font-normal ml-1" style={{ color: artist.blacklisted ? '#ff0000' : '#555555' }}>
-                                                ({artist.countries.join(', ')})
+                                                {' '}({artist.countries.join(', ')})
                                             </span>
                                         )}
                                     </span>
