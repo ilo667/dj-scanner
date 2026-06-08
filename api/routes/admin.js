@@ -22,7 +22,7 @@ router.get('/artists', requireAuth, async (req, res) => {
             `SELECT a.id, a.name
              FROM artists a
              JOIN genres g ON g.id = $1
-             WHERE g.name = 'All Genres' OR a.genre_id = g.id
+             WHERE (g.name = 'All Genres' OR a.genre_id = g.id) AND a.is_blacklisted = true
              ORDER BY a.name ASC`,
             [id]
         );
@@ -36,23 +36,37 @@ router.get('/artists', requireAuth, async (req, res) => {
 
 router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const { name, genre_id } = req.body;
+        const { name, genre_id, country_ids = [] } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({ error: 'Artist name is required' });
         }
 
         const result = await pool.query(
-            'INSERT INTO artists (name, genre_id) VALUES ($1, $2) RETURNING id, name, genre_id',
+            'INSERT INTO artists (name, genre_id, is_blacklisted) VALUES ($1, $2, true) RETURNING id, name, genre_id, is_blacklisted',
             [name.trim(), genre_id ?? null]
         );
 
         if (!result.rows[0]) throw new Error('Insert failed to return artist');
 
-        return res.status(201).json({ success: true, artist: result.rows[0] });
+        const artist = result.rows[0];
+
+        if (Array.isArray(country_ids) && country_ids.length > 0) {
+            const values = country_ids.map((cid, i) => `($1, $${i + 2})`).join(', ');
+
+            await pool.query(
+                `INSERT INTO artist_countries (artist_id, country_id) VALUES ${values}`,
+                [artist.id, ...country_ids]
+            );
+        }
+
+        return res.status(201).json({ success: true, artist });
     } catch (error) {
         if (error.code === '23505') {
             return res.status(400).json({ error: 'Artist already exists' });
+        }
+        if (error.code === '23503') {
+            return res.status(400).json({ error: 'Invalid country ID' });
         }
         console.error(error);
         return res.status(500).json({ error: 'Server error' });

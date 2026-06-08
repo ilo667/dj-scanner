@@ -17,7 +17,8 @@ export function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="scan" element={<ScanTracklist />} />
-                <Route path="admin" element={<Admin />} />
+                {/* TODO: /admin should become a menu page with links to blacklist, whitelist, genres */}
+                <Route path="admin/blacklist" element={<Admin />} />
                 <Route path="admin/genres" element={<AdminGenres />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
