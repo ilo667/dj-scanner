@@ -54,7 +54,9 @@ export default function Admin() {
             const data = await res.json();
 
             setCountries(data);
-        } catch {}
+        } catch (err) {
+            console.error('Failed to fetch countries:', err);
+        }
     }
 
     async function fetchGenres() {

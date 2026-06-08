@@ -36,15 +36,15 @@ router.get('/artists', requireAuth, async (req, res) => {
 
 router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     try {
-        const { name, genre_id, is_blacklisted = true, country_ids = [] } = req.body;
+        const { name, genre_id, country_ids = [] } = req.body;
 
         if (!name || !name.trim()) {
             return res.status(400).json({ error: 'Artist name is required' });
         }
 
         const result = await pool.query(
-            'INSERT INTO artists (name, genre_id, is_blacklisted) VALUES ($1, $2, $3) RETURNING id, name, genre_id, is_blacklisted',
-            [name.trim(), genre_id ?? null, is_blacklisted]
+            'INSERT INTO artists (name, genre_id, is_blacklisted) VALUES ($1, $2, true) RETURNING id, name, genre_id, is_blacklisted',
+            [name.trim(), genre_id ?? null]
         );
 
         if (!result.rows[0]) throw new Error('Insert failed to return artist');
@@ -64,6 +64,9 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     } catch (error) {
         if (error.code === '23505') {
             return res.status(400).json({ error: 'Artist already exists' });
+        }
+        if (error.code === '23503') {
+            return res.status(400).json({ error: 'Invalid country ID' });
         }
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
