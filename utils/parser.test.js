@@ -1,6 +1,6 @@
 const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
-const { parseArtists } = require('./parser');
+const { parseArtists, separateArtists } = require('./parser');
 
 describe('plain text format', () => {
     test('Artist - Track', () => {
@@ -430,5 +430,44 @@ describe('TSV format (Beatport export)', () => {
         const input = '#\tName\tArtist\n1\tTrack\tArtist One';
         const result = parseArtists(input);
         assert.equal(result.length, 0);
+    });
+});
+
+describe('separateArtists — used for Apple Music artistName and YouTube channel title', () => {
+    test('duet with & is preserved — Chase & Status', () => {
+        assert.deepEqual(separateArtists('Chase & Status'), ['Chase & Status']);
+    });
+
+    test('duet with & is preserved — Camo & Krooked', () => {
+        assert.deepEqual(separateArtists('Camo & Krooked'), ['Camo & Krooked']);
+    });
+
+    test('duet with & is preserved — Kryptic Minds & Leon Switch combined with another', () => {
+        const result = separateArtists('Kryptic Minds & Leon Switch, Dekota');
+        assert.ok(result.includes('Kryptic Minds & Leon Switch'));
+        assert.ok(result.includes('Dekota'));
+    });
+
+    test('non-duet & is split — RoyGreen, Protone & Ben Soundscape', () => {
+        const result = separateArtists('RoyGreen, Protone & Ben Soundscape');
+        assert.ok(result.includes('RoyGreen'));
+        assert.ok(result.includes('Protone'));
+        assert.ok(result.includes('Ben Soundscape'));
+        assert.equal(result.filter(a => a === 'Protone & Ben Soundscape').length, 0);
+    });
+
+    test('non-duet & is split — SAMOGON & BASS', () => {
+        const result = separateArtists('SAMOGON & BASS');
+        assert.ok(result.includes('SAMOGON'));
+        assert.ok(result.includes('BASS'));
+    });
+
+    test('comma-separated artists are split', () => {
+        const result = separateArtists('Artist A, Artist B');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('single artist returned as-is', () => {
+        assert.deepEqual(separateArtists('Sub Focus'), ['Sub Focus']);
     });
 });

@@ -109,8 +109,8 @@ router.post('/youtube', scanLimiter, async (req, res) => {
 
                 if (!title || title === 'Deleted video' || title === 'Private video') continue;
 
-                // extract from channel name: "Artist Name - Topic" → "Artist Name"
-                if (channelTitle) {
+                // extract from official artist channels: "Artist Name - Topic" → "Artist Name"
+                if (channelTitle && /\s*-\s*Topic$/i.test(channelTitle)) {
                     const artist = channelTitle.replace(/\s*-\s*Topic$/i, '').trim();
 
                     if (artist) separateArtists(artist).forEach(a => artistSet.add(a));
