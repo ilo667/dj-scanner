@@ -11,6 +11,7 @@ export default function Home() {
                 <li>Розпізнавання тексту зі <strong>скріншотів і зображень</strong></li>
                 <li>Імпорт плейлистів із <strong>Spotify через Exportify CSV</strong> і сканування</li>
                 <li>Імпорт плейлистів із <strong>YouTube та YouTube Music</strong> за посиланням</li>
+                <li>Імпорт плейлистів із <strong>Apple Music</strong> за посиланням</li>
                 <li>Автоматичне визначення <strong>артистів та їх країн</strong></li>
                 <li>Швидка перевірка та <strong>фільтрація небажаних виконавців</strong></li>
                 <li>Перегляд і фільтрація виконавців за <strong>жанрами</strong> для залогінених користувачів</li>

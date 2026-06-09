@@ -13,6 +13,8 @@ export default function ScanTracklist() {
     const [spotifyGuideOpen, setSpotifyGuideOpen] = React.useState(false);
     const [youtubeOpen, setYoutubeOpen] = React.useState(false);
     const [youtubeUrl, setYoutubeUrl] = React.useState('');
+    const [appleMusicOpen, setAppleMusicOpen] = React.useState(false);
+    const [appleMusicUrl, setAppleMusicUrl] = React.useState('');
     const location = useLocation();
 
     React.useEffect(() => {
@@ -24,6 +26,8 @@ export default function ScanTracklist() {
         setSpotifyGuideOpen(false);
         setYoutubeOpen(false);
         setYoutubeUrl('');
+        setAppleMusicOpen(false);
+        setAppleMusicUrl('');
     }, [location.key]);
 
     const previewUrl = React.useMemo(() => {
@@ -52,6 +56,40 @@ export default function ScanTracklist() {
 
         if (img) {
             setFile(img);
+        }
+    }
+
+    async function onAppleMusicSubmit() {
+        if (!appleMusicUrl.trim()) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('/api/scan/apple-music', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: appleMusicUrl.trim() })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(response.status === 429
+                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
+                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
+                );
+                return;
+            }
+
+            setArtists(data.artists);
+            setAppleMusicUrl('');
+            setAppleMusicOpen(false);
+        } catch (err) {
+            console.error(err);
+            setError('Something went wrong while scanning playlist. Please try again.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -152,7 +190,7 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
-                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); }}
+                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); }}
                                         className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
                                     >
                                         <img src="/spotify-icon.svg" alt="" width="20" height="20" style={{ height: '20px' }} />
@@ -173,7 +211,7 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
-                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); }}
+                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); setAppleMusicOpen(false); }}
                                         className="inline-flex items-center gap-2 rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
                                     >
                                         <img src="/youtube-icon.png" alt="" style={{ height: '26px', width: 'auto', marginTop: '-1px', marginBottom: '-1px' }} />
@@ -193,6 +231,36 @@ export default function ScanTracklist() {
                                                     type="button"
                                                     onClick={onYoutubeSubmit}
                                                     className="rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
+                                                >
+                                                    Scan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
+                                        className="inline-flex items-center gap-2 rounded-md bg-[#ff0436] px-4 py-2 font-semibold text-white hover:bg-[#cc0330]"
+                                    >
+                                        <img src="/apple-music-icon.svg" alt="" style={{ height: '20px', width: 'auto' }} />
+                                        Scan Apple Music
+                                    </button>
+                                    {appleMusicOpen && (
+                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={appleMusicUrl}
+                                                    onChange={(e) => setAppleMusicUrl(e.target.value)}
+                                                    placeholder="https://music.apple.com/ua/playlist/..."
+                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={onAppleMusicSubmit}
+                                                    className="rounded-md bg-[#ff0436] px-4 py-2 font-semibold text-white hover:bg-[#cc0330]"
                                                 >
                                                     Scan
                                                 </button>
