@@ -253,7 +253,7 @@ router.post('/apple-music', scanLimiter, async (req, res) => {
 
                 if (artistName) {
                     artistName
-                        .split(/\s*[,&]\s*|\s+feat\.?\s+|\s+ft\.?\s+/i)
+                        .split(/\s*[,&]\s*|\s+feat\.?\s+|\s+ft\.?\s+|\s+and\s+|\s+vs\.?\s+/i)
                         .map(a => a.trim())
                         .filter(Boolean)
                         .forEach(a => artistSet.add(a));

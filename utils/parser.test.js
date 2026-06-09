@@ -28,6 +28,14 @@ describe('plain text format', () => {
     test('empty input returns empty array', () => {
         assert.deepEqual(parseArtists(''), []);
     });
+
+    test('null input returns empty array', () => {
+        assert.deepEqual(parseArtists(null), []);
+    });
+
+    test('undefined input returns empty array', () => {
+        assert.deepEqual(parseArtists(undefined), []);
+    });
 });
 
 describe('multiple artists', () => {
@@ -49,6 +57,28 @@ describe('multiple artists', () => {
     test('A ft. B - Track', () => {
         const result = parseArtists('Artist A ft. Artist B - Track');
         assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('A and B - Track', () => {
+        const result = parseArtists('Georgia Yates and Bev Lee Harling - Track');
+        assert.deepEqual(result, ['Georgia Yates', 'Bev Lee Harling']);
+    });
+
+    test('A vs. B - Track', () => {
+        const result = parseArtists('Sub Focus vs. Wilkinson - Track');
+        assert.deepEqual(result, ['Sub Focus', 'Wilkinson']);
+    });
+
+    test('A vs B - Track (without dot)', () => {
+        const result = parseArtists('Artist A vs Artist B - Track');
+        assert.deepEqual(result, ['Artist A', 'Artist B']);
+    });
+
+    test('combined separators A & B and C - Track', () => {
+        const result = parseArtists('Artist A & Artist B and Artist C - Track');
+        assert.ok(result.includes('Artist A'));
+        assert.ok(result.includes('Artist B'));
+        assert.ok(result.includes('Artist C'));
     });
 });
 
@@ -105,6 +135,40 @@ TRACK 02 AUDIO
         const result = parseArtists(input);
         assert.ok(result.includes('Artist One'));
         assert.ok(result.includes('Artist Two'));
+    });
+});
+
+describe('Spotify CSV format', () => {
+    test('single artist per track', () => {
+        const input = [
+            'Spotify URI,Track Name,Artist Name(s),Album Name',
+            'spotify:track:1,"Track One","Artist One","Album"',
+            'spotify:track:2,"Track Two","Artist Two","Album"',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('Artist One'));
+        assert.ok(result.includes('Artist Two'));
+    });
+
+    test('multiple artists separated by semicolon', () => {
+        const input = [
+            'Spotify URI,Track Name,Artist Name(s),Album Name',
+            'spotify:track:1,"Track","Artist A;Artist B;Artist C","Album"',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('Artist A'));
+        assert.ok(result.includes('Artist B'));
+        assert.ok(result.includes('Artist C'));
+    });
+
+    test('deduplication across tracks', () => {
+        const input = [
+            'Spotify URI,Track Name,Artist Name(s),Album Name',
+            'spotify:track:1,"Track One","Artist One","Album"',
+            'spotify:track:2,"Track Two","Artist One","Album"',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.equal(result.filter(a => a === 'Artist One').length, 1);
     });
 });
 

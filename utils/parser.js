@@ -1,5 +1,5 @@
 const TRACK_NUMBER_REGEX = /^\d+(?:\.\d+)*[\.\)]\s*/;
-const ARTIST_SEPARATOR_REGEX = /\s*(?:&|,|\b(?:feat|ft)\b\.?)\s*/i;
+const ARTIST_SEPARATOR_REGEX = /\s*(?:&|,|\b(?:feat|ft|and|vs)\b\.?)\s*/i;
 const REMIX_REGEX = /\(([^()]+?)\s+Remix\)/i;
 const FEAT_REGEX = /\(\s*(?:\b(?:feat|ft)\b\.?)\s+([^)]+)\)/i;
 
