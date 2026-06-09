@@ -15,6 +15,8 @@ export default function ScanTracklist() {
     const [youtubeUrl, setYoutubeUrl] = React.useState('');
     const [appleMusicOpen, setAppleMusicOpen] = React.useState(false);
     const [appleMusicUrl, setAppleMusicUrl] = React.useState('');
+    const [deezerOpen, setDeezerOpen] = React.useState(false);
+    const [deezerUrl, setDeezerUrl] = React.useState('');
     const location = useLocation();
 
     React.useEffect(() => {
@@ -28,6 +30,8 @@ export default function ScanTracklist() {
         setYoutubeUrl('');
         setAppleMusicOpen(false);
         setAppleMusicUrl('');
+        setDeezerOpen(false);
+        setDeezerUrl('');
     }, [location.key]);
 
     const previewUrl = React.useMemo(() => {
@@ -56,6 +60,40 @@ export default function ScanTracklist() {
 
         if (img) {
             setFile(img);
+        }
+    }
+
+    async function onDeezerSubmit() {
+        if (!deezerUrl.trim()) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('/api/scan/deezer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: deezerUrl.trim() })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(response.status === 429
+                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
+                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
+                );
+                return;
+            }
+
+            setArtists(data.artists);
+            setDeezerUrl('');
+            setDeezerOpen(false);
+        } catch (err) {
+            console.error(err);
+            setError('Something went wrong while scanning playlist. Please try again.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -190,7 +228,7 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
-                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
+                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); setDeezerOpen(false); }}
                                         className="relative inline-flex items-center rounded-md bg-[#ff4e6b] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
                                     >
                                         <img src="/apple-music-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
@@ -220,7 +258,39 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
-                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); }}
+                                        onClick={() => { setDeezerOpen(h => !h); setAppleMusicOpen(false); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
+                                        className="relative inline-flex items-center rounded-md bg-[#A238FF] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#8a2de6]"
+                                    >
+                                        <img src="/deezer-icon.png" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
+                                        Scan Deezer
+                                    </button>
+                                    {deezerOpen && (
+                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={deezerUrl}
+                                                    onChange={(e) => setDeezerUrl(e.target.value)}
+                                                    placeholder="https://www.deezer.com/en/playlist/..."
+                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                    onKeyDown={(e) => e.key === 'Enter' && onDeezerSubmit()}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={onDeezerSubmit}
+                                                    disabled={loading}
+                                                    className="rounded-md bg-[#A238FF] px-4 py-2 font-semibold text-white hover:bg-[#8a2de6] disabled:opacity-50"
+                                                >
+                                                    Scan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); setDeezerOpen(false); }}
                                         className="relative inline-flex items-center rounded-md bg-[#1ED760] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
                                     >
                                         <img src="/spotify-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
@@ -241,7 +311,7 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
-                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); setAppleMusicOpen(false); }}
+                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); setAppleMusicOpen(false); setDeezerOpen(false); }}
                                         className="relative inline-flex items-center rounded-md bg-[#FF0033] pl-[54px] pr-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
                                     >
                                         <img src="/youtube-icon.png" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: 'auto', width: '31px' }} />
