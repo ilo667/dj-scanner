@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const multer = require('multer');
 const rateLimit = require('express-rate-limit');
-const { parseArtists } = require('../../utils/parser');
+const { parseArtists, separateArtists } = require('../../utils/parser');
 const { checkArtists } = require('../../utils/artists-check');
 
 const router = Router();
@@ -252,7 +252,7 @@ router.post('/apple-music', scanLimiter, async (req, res) => {
                 const trackName = track.attributes?.name;
 
                 if (artistName) {
-                    artistSet.add(artistName);
+                    separateArtists(artistName).forEach(a => artistSet.add(a));
                 }
 
                 if (trackName) {

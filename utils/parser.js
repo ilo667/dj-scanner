@@ -298,5 +298,6 @@ function parseArtists(input) {
 }
 
 module.exports = {
-    parseArtists
+    parseArtists,
+    separateArtists
 };
