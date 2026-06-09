@@ -113,7 +113,7 @@ router.post('/youtube', scanLimiter, async (req, res) => {
                 if (channelTitle) {
                     const artist = channelTitle.replace(/\s*-\s*Topic$/i, '').trim();
 
-                    if (artist) artistSet.add(artist);
+                    if (artist) separateArtists(artist).forEach(a => artistSet.add(a));
                 }
 
                 // extract additional artists from title (feat, remix, etc.)
