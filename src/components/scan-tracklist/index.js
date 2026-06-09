@@ -191,9 +191,9 @@ export default function ScanTracklist() {
                                     <button
                                         type="button"
                                         onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
-                                        className="inline-flex items-center gap-2 rounded-md bg-[#ff4e6b] px-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
+                                        className="relative inline-flex items-center rounded-md bg-[#ff4e6b] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
                                     >
-                                        <img src="/apple-music-icon.svg" alt="" style={{ height: '20px', width: 'auto' }} />
+                                        <img src="/apple-music-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
                                         Scan Apple Music
                                     </button>
                                     {appleMusicOpen && (
@@ -221,9 +221,9 @@ export default function ScanTracklist() {
                                     <button
                                         type="button"
                                         onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); }}
-                                        className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
+                                        className="relative inline-flex items-center rounded-md bg-[#1ED760] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
                                     >
-                                        <img src="/spotify-icon.svg" alt="" width="20" height="20" style={{ height: '20px' }} />
+                                        <img src="/spotify-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
                                         Scan Spotify
                                     </button>
                                     {spotifyGuideOpen && (
@@ -242,9 +242,9 @@ export default function ScanTracklist() {
                                     <button
                                         type="button"
                                         onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); setAppleMusicOpen(false); }}
-                                        className="inline-flex items-center gap-2 rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
+                                        className="relative inline-flex items-center rounded-md bg-[#FF0033] pl-[54px] pr-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
                                     >
-                                        <img src="/youtube-icon.png" alt="" style={{ height: '26px', width: 'auto', marginTop: '-1px', marginBottom: '-1px' }} />
+                                        <img src="/youtube-icon.png" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: 'auto', width: '31px' }} />
                                         Scan YouTube Music
                                     </button>
                                     {youtubeOpen && (
