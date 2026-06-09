@@ -190,6 +190,36 @@ export default function ScanTracklist() {
                                 <div className="relative">
                                     <button
                                         type="button"
+                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
+                                        className="inline-flex items-center gap-2 rounded-md bg-[#ff4e6b] px-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
+                                    >
+                                        <img src="/apple-music-icon.svg" alt="" style={{ height: '20px', width: 'auto' }} />
+                                        Scan Apple Music
+                                    </button>
+                                    {appleMusicOpen && (
+                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={appleMusicUrl}
+                                                    onChange={(e) => setAppleMusicUrl(e.target.value)}
+                                                    placeholder="https://music.apple.com/ua/playlist/..."
+                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={onAppleMusicSubmit}
+                                                    className="rounded-md bg-[#ff4e6b] px-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
+                                                >
+                                                    Scan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative">
+                                    <button
+                                        type="button"
                                         onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); }}
                                         className="inline-flex items-center gap-2 rounded-md bg-[#1ED760] px-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
                                     >
@@ -231,36 +261,6 @@ export default function ScanTracklist() {
                                                     type="button"
                                                     onClick={onYoutubeSubmit}
                                                     className="rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
-                                                >
-                                                    Scan
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
-                                        className="inline-flex items-center gap-2 rounded-md bg-[#ff0436] px-4 py-2 font-semibold text-white hover:bg-[#cc0330]"
-                                    >
-                                        <img src="/apple-music-icon.svg" alt="" style={{ height: '20px', width: 'auto' }} />
-                                        Scan Apple Music
-                                    </button>
-                                    {appleMusicOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={appleMusicUrl}
-                                                    onChange={(e) => setAppleMusicUrl(e.target.value)}
-                                                    placeholder="https://music.apple.com/ua/playlist/..."
-                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={onAppleMusicSubmit}
-                                                    className="rounded-md bg-[#ff0436] px-4 py-2 font-semibold text-white hover:bg-[#cc0330]"
                                                 >
                                                     Scan
                                                 </button>
