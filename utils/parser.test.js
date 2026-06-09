@@ -464,7 +464,7 @@ describe('SoundCloud track name patterns', () => {
     });
 });
 
-describe('TSV format (Beatport export)', () => {
+describe('TSV format (Rekordbox export)', () => {
     test('tab-separated with Track Title and Artist columns', () => {
         const input = [
             '#\tTrack Title\tArtist\tBPM',
