@@ -414,6 +414,56 @@ describe('Deezer track name patterns', () => {
     });
 });
 
+// SoundCloud real-world patterns
+describe('SoundCloud track name patterns', () => {
+    test('standard format — Seba - Camouflage', () => {
+        const result = parseArtists('Seba - Camouflage');
+        assert.ok(result.includes('Seba'));
+    });
+
+    test('label suffix in brackets — QZB - Tech Priest [Bassrush Premiere]', () => {
+        const result = parseArtists('QZB - Tech Priest [Bassrush Premiere]');
+        assert.ok(result.includes('QZB'));
+    });
+
+    test('label suffix in brackets — CELO - Fall [NVR056: OUT NOW]', () => {
+        const result = parseArtists('CELO - Fall [NVR056: OUT NOW]');
+        assert.ok(result.includes('CELO'));
+    });
+
+    test('remix without artist part — Bottomfeeder (Gridlok Remix)', () => {
+        const result = parseArtists('Bottomfeeder (Gridlok Remix)');
+        assert.ok(result.includes('Gridlok'));
+    });
+
+    test('remix without artist part — Allergens (Bop Remix)', () => {
+        const result = parseArtists('Allergens (Bop Remix)');
+        assert.ok(result.includes('Bop'));
+    });
+
+    test('remix in feat format — Free Yourself (CELO Remix) [feat. Claire Pilling]', () => {
+        const result = parseArtists('Free Yourself (CELO Remix) [feat. Claire Pilling]');
+        assert.ok(result.includes('CELO'));
+    });
+
+    test('two artists with & — Rowpieces & Soul Cube - Seduce Me', () => {
+        const result = parseArtists('Rowpieces & Soul Cube - Seduce Me');
+        assert.ok(result.includes('Rowpieces'));
+        assert.ok(result.includes('Soul Cube'));
+    });
+
+    test('two artists with & — Nemy & Missing - Did To Me', () => {
+        const result = parseArtists('Nemy & Missing - Did To Me');
+        assert.ok(result.includes('Nemy'));
+        assert.ok(result.includes('Missing'));
+    });
+
+    test('all-caps artist — SUBWAY FUNK - Autumn Break', () => {
+        const result = parseArtists('SUBWAY FUNK - Autumn Break');
+        assert.ok(result.includes('SUBWAY FUNK'));
+    });
+});
+
 describe('TSV format (Beatport export)', () => {
     test('tab-separated with Track Title and Artist columns', () => {
         const input = [

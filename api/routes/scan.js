@@ -6,6 +6,7 @@ const { checkArtists } = require('../../utils/artists-check');
 const handleYoutube = require('./scan/youtube');
 const handleAppleMusic = require('./scan/apple-music');
 const handleDeezer = require('./scan/deezer');
+const handleSoundCloud = require('./scan/soundcloud');
 
 const router = Router();
 
@@ -66,5 +67,6 @@ function decodeBuffer(buffer) {
 router.post('/youtube', scanLimiter, handleYoutube);
 router.post('/apple-music', scanLimiter, handleAppleMusic);
 router.post('/deezer', scanLimiter, handleDeezer);
+router.post('/soundcloud', scanLimiter, handleSoundCloud);
 
 module.exports = router;
