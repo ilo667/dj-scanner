@@ -172,6 +172,162 @@ describe('Spotify CSV format', () => {
     });
 });
 
+// Apple Music real-world patterns
+describe('Apple Music track name patterns', () => {
+    test('feat. with comma and & — Again (feat. Ms Banks, Ms. Dynamite & JayKae)', () => {
+        const result = parseArtists('Again (feat. Ms Banks, Ms. Dynamite & JayKae)');
+        assert.ok(result.includes('Ms Banks'));
+        assert.ok(result.includes('Ms. Dynamite'));
+        assert.ok(result.includes('JayKae'));
+    });
+
+    test('feat. with & — Time Is Hardcore (feat. Kae Tempest & Anita Blay)', () => {
+        const result = parseArtists('Time Is Hardcore (feat. Kae Tempest & Anita Blay)');
+        assert.ok(result.includes('Kae Tempest'));
+        assert.ok(result.includes('Anita Blay'));
+    });
+
+    test('feat. with and — Falling Out of Consciousness (feat. Georgia Yates and Bev Lee Harling)', () => {
+        const result = parseArtists('Falling Out of Consciousness (feat. Georgia Yates and Bev Lee Harling)');
+        assert.ok(result.includes('Georgia Yates'));
+        assert.ok(result.includes('Bev Lee Harling'));
+    });
+
+    test('remix with vs. — Just Hold On (Sub Focus & Wilkinson vs. Pola & Bryson Remix)', () => {
+        const result = parseArtists('Just Hold On (Sub Focus & Wilkinson vs. Pola & Bryson Remix)');
+        assert.ok(result.includes('Sub Focus'));
+        assert.ok(result.includes('Wilkinson'));
+        assert.ok(result.includes('Pola'));
+        assert.ok(result.includes('Bryson'));
+    });
+
+    test('remix with dot in name — Always Yours (S.P.Y Remix)', () => {
+        const result = parseArtists('Always Yours (S.P.Y Remix)');
+        assert.ok(result.includes('S.P.Y'));
+    });
+
+    test('feat. with multiple & — Murder Music (feat. Kabaka Pyramid & Ms. Dynamite)', () => {
+        const result = parseArtists('Murder Music (feat. Kabaka Pyramid & Ms. Dynamite)');
+        assert.ok(result.includes('Kabaka Pyramid'));
+        assert.ok(result.includes('Ms. Dynamite'));
+    });
+});
+
+// Spotify CSV real-world patterns
+describe('Spotify CSV real-world patterns', () => {
+    test('real Exportify column order: Track URI, Track Name, Album Name, Artist Name(s)', () => {
+        const input = [
+            'Track URI,Track Name,Album Name,Artist Name(s),Release Date',
+            'spotify:track:1,"Full Send - Pirapus Remix","Full Send (Pirapus Remix)","1991;Pirapus",2026-05-14',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('1991'));
+        assert.ok(result.includes('Pirapus'));
+    });
+
+    test('artist name with & is preserved as one artist — Pola & Bryson', () => {
+        const input = [
+            'Track URI,Track Name,Album Name,Artist Name(s),Release Date',
+            'spotify:track:1,"Close To You","Album","ARLE;Pola & Bryson",2017-06-23',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('Pola & Bryson'));
+        assert.ok(result.includes('ARLE'));
+        assert.equal(result.filter(a => a === 'Pola').length, 0);
+    });
+
+    test('artist with & in name alongside other artists — Above & Beyond;Zoë Johnston;Koven', () => {
+        const input = [
+            'Track URI,Track Name,Album Name,Artist Name(s),Release Date',
+            'spotify:track:1,"Carry Me Home","Album","Above & Beyond;Zoë Johnston;Koven",2026-04-24',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('Above & Beyond'));
+        assert.ok(result.includes('Zoë Johnston'));
+        assert.ok(result.includes('Koven'));
+    });
+
+    test('artist name that is a number — 1991', () => {
+        const input = [
+            'Track URI,Track Name,Album Name,Artist Name(s),Release Date',
+            'spotify:track:1,"Icarus","Icarus","1991;TW3LVE",2026-02-20',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('1991'));
+        assert.ok(result.includes('TW3LVE'));
+    });
+
+    test('artist names with special characters — [IVY], ÆON:MODE, goddard.', () => {
+        const input = [
+            'Track URI,Track Name,Album Name,Artist Name(s),Release Date',
+            'spotify:track:1,"Car Crash","Car Crash","[IVY];XIRA",2026-06-05',
+            'spotify:track:2,"Glow","Glow","Delta Heavy;ÆON:MODE;Nu-La",2026-04-02',
+            'spotify:track:3,"day & night","day & night","goddard.",2026-05-21',
+        ].join('\n');
+        const result = parseArtists(input);
+        assert.ok(result.includes('[IVY]'));
+        assert.ok(result.includes('ÆON:MODE'));
+        assert.ok(result.includes('goddard.'));
+    });
+});
+
+// YouTube Music real-world patterns
+describe('YouTube Music track name patterns', () => {
+    test('ft. in artist part — Flume ft. Toro Y Moi - The Difference (High Contrast Remix)', () => {
+        const result = parseArtists('Flume ft. Toro Y Moi - The Difference (High Contrast Remix)');
+        assert.ok(result.includes('Flume'));
+        assert.ok(result.includes('Toro Y Moi'));
+        assert.ok(result.includes('High Contrast'));
+    });
+
+    test('comma-separated artists — OB1, Creatures & Revan - Fat Twins', () => {
+        const result = parseArtists('OB1, Creatures & Revan - Fat Twins');
+        assert.ok(result.includes('OB1'));
+        assert.ok(result.includes('Creatures'));
+        assert.ok(result.includes('Revan'));
+    });
+
+    test('& + ft. + remix — Moby & goddard. ft. Lovelle - Stereo (High Contrast Remix)', () => {
+        const result = parseArtists('Moby & goddard. ft. Lovelle - Stereo (High Contrast Remix)');
+        assert.ok(result.includes('Moby'));
+        assert.ok(result.includes('goddard.'));
+        assert.ok(result.includes('Lovelle'));
+        assert.ok(result.includes('High Contrast'));
+    });
+
+    test('vs without dot — Fatboy Slim vs Shao Bao - Купила мама коника', () => {
+        const result = parseArtists('Fatboy Slim vs Shao Bao - Купила мама коника (Yura Van Gogh mash-up)');
+        assert.ok(result.includes('Fatboy Slim'));
+        assert.ok(result.includes('Shao Bao'));
+    });
+
+    test('ft. inside parens with dotted name — S.P.Y - Sweet Sound (ft. The Melody Men)', () => {
+        const result = parseArtists('S.P.Y - Sweet Sound (ft. The Melody Men)');
+        assert.ok(result.includes('S.P.Y'));
+        assert.ok(result.includes('The Melody Men'));
+    });
+
+    test('comma + & — SILK, Subsonic & Nito Onna - I NEED U 2', () => {
+        const result = parseArtists('SILK, Subsonic & Nito Onna - I NEED U 2 (Lyrics)');
+        assert.ok(result.includes('SILK'));
+        assert.ok(result.includes('Subsonic'));
+        assert.ok(result.includes('Nito Onna'));
+    });
+
+    test('& + comma + Ft. — Kryptic Minds & Leon Switch, Dekota Ft. Skitty - Drifting Away', () => {
+        const result = parseArtists('Kryptic Minds & Leon Switch, Dekota Ft. Skitty - Drifting Away');
+        assert.ok(result.includes('Kryptic Minds'));
+        assert.ok(result.includes('Leon Switch'));
+        assert.ok(result.includes('Dekota'));
+        assert.ok(result.includes('Skitty'));
+    });
+
+    test('artist name with dots — A.M.C - There In 10', () => {
+        const result = parseArtists('A.M.C - There In 10 [UKF Release]');
+        assert.ok(result.includes('A.M.C'));
+    });
+});
+
 describe('TSV format (Beatport export)', () => {
     test('tab-separated with Track Title and Artist columns', () => {
         const input = [

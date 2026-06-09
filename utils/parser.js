@@ -40,7 +40,7 @@ function extractArtistsFromTitle(title) {
     const remixMatch = title.match(REMIX_REGEX);
 
     if (remixMatch?.[1]) {
-        artists.push(remixMatch[1].trim());
+        artists.push(...separateArtists(remixMatch[1].trim()));
     }
 
     const featMatch = title.match(FEAT_REGEX);
