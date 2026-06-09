@@ -3,6 +3,27 @@ const ARTIST_SEPARATOR_REGEX = /\s*(?:&|,|\b(?:feat|ft|and|vs)\b\.?)\s*/i;
 const REMIX_REGEX = /\(([^()]+?)\s+Remix\)/i;
 const FEAT_REGEX = /\(\s*(?:\b(?:feat|ft)\b\.?)\s+([^)]+)\)/i;
 
+// Artist names containing & that must not be split
+const DUET_EXCEPTIONS = [
+    'Above & Beyond',
+    'Camo & Krooked',
+    'Derrick & Tonika',
+    'Dutch & Graft',
+    'Drumsound & Bassline Smith',
+    'Chase & Status',
+    'Follix & Back Up',
+    'Freaks & Geeks',
+    'Fred V & Grafix',
+    'Gancher & Ruin',
+    'Kryptic Minds & Leon Switch',
+    'Macca & Loz Contreras',
+    'Matrix & Futurebound',
+    'Pola & Bryson',
+    'ressotto & wcry',
+    'T & Sugah',
+    'Zahharov & Alina Enn',
+];
+
 // remove spaces
 function normalizeLine(input) {
     return (input || '').trim();
@@ -17,10 +38,28 @@ function unquote(quotedText) {
     return quotedText.replace(/^"(.*)"$/, '$1');
 }
 
-// split by & , feat, ft, comma
+// split by & , feat, ft, comma — but keep known duets intact
 function separateArtists(artistPart) {
-    return artistPart
+    let protected_ = artistPart;
+    const placeholders = [];
+
+    for (const duet of DUET_EXCEPTIONS) {
+        const idx = protected_.toLowerCase().indexOf(duet.toLowerCase());
+
+        if (idx !== -1) {
+            const placeholder = `\x00DUET${placeholders.length}\x00`;
+
+            placeholders.push(protected_.slice(idx, idx + duet.length));
+            protected_ = protected_.slice(0, idx) + placeholder + protected_.slice(idx + duet.length);
+        }
+    }
+
+    return protected_
         .split(ARTIST_SEPARATOR_REGEX)
+        .map(part => {
+            const m = part.match(/^\x00DUET(\d+)\x00$/);
+            return m ? placeholders[Number(m[1])] : part;
+        })
         .map(artistName => artistName.trim())
         .filter(Boolean);
 }

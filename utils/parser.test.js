@@ -38,6 +38,53 @@ describe('plain text format', () => {
     });
 });
 
+describe('duet exceptions — & not split', () => {
+    const duets = [
+        'Above & Beyond',
+        'Camo & Krooked',
+        'Chase & Status',
+        'Derrick & Tonika',
+        'Drumsound & Bassline Smith',
+        'Dutch & Graft',
+        'Follix & Back Up',
+        'Freaks & Geeks',
+        'Fred V & Grafix',
+        'Gancher & Ruin',
+        'Kryptic Minds & Leon Switch',
+        'Macca & Loz Contreras',
+        'Matrix & Futurebound',
+        'Pola & Bryson',
+        'ressotto & wcry',
+        'T & Sugah',
+        'Zahharov & Alina Enn',
+    ];
+
+    for (const duet of duets) {
+        test(`${duet} - Track`, () => {
+            const result = parseArtists(`${duet} - Track Name`);
+            assert.ok(result.includes(duet), `"${duet}" should not be split`);
+        });
+    }
+
+    test('duet combined with another artist — Chase & Status & Sub Focus - Track', () => {
+        const result = parseArtists('Chase & Status & Sub Focus - Track');
+        assert.ok(result.includes('Chase & Status'));
+        assert.ok(result.includes('Sub Focus'));
+    });
+
+    test('duet in feat — Artist - Track (feat. Pola & Bryson)', () => {
+        const result = parseArtists('Artist - Track (feat. Pola & Bryson)');
+        assert.ok(result.includes('Pola & Bryson'));
+        assert.equal(result.filter(a => a === 'Pola').length, 0);
+    });
+
+    test('duet in remix — Track (Fred V & Grafix Remix)', () => {
+        const result = parseArtists('Artist - Track (Fred V & Grafix Remix)');
+        assert.ok(result.includes('Fred V & Grafix'));
+        assert.equal(result.filter(a => a === 'Fred V').length, 0);
+    });
+});
+
 describe('multiple artists', () => {
     test('A & B - Track', () => {
         const result = parseArtists('Artist A & Artist B - Track');
@@ -197,8 +244,7 @@ describe('Apple Music track name patterns', () => {
         const result = parseArtists('Just Hold On (Sub Focus & Wilkinson vs. Pola & Bryson Remix)');
         assert.ok(result.includes('Sub Focus'));
         assert.ok(result.includes('Wilkinson'));
-        assert.ok(result.includes('Pola'));
-        assert.ok(result.includes('Bryson'));
+        assert.ok(result.includes('Pola & Bryson'));
     });
 
     test('remix with dot in name — Always Yours (S.P.Y Remix)', () => {
@@ -316,8 +362,7 @@ describe('YouTube Music track name patterns', () => {
 
     test('& + comma + Ft. — Kryptic Minds & Leon Switch, Dekota Ft. Skitty - Drifting Away', () => {
         const result = parseArtists('Kryptic Minds & Leon Switch, Dekota Ft. Skitty - Drifting Away');
-        assert.ok(result.includes('Kryptic Minds'));
-        assert.ok(result.includes('Leon Switch'));
+        assert.ok(result.includes('Kryptic Minds & Leon Switch'));
         assert.ok(result.includes('Dekota'));
         assert.ok(result.includes('Skitty'));
     });
