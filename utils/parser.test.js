@@ -373,6 +373,47 @@ describe('YouTube Music track name patterns', () => {
     });
 });
 
+// Deezer real-world patterns
+describe('Deezer track name patterns', () => {
+    test('numeric remixer — Perfect (Exceeder) (1991 Remix)', () => {
+        const result = parseArtists('Perfect (Exceeder) (1991 Remix)');
+        assert.ok(result.includes('1991'));
+    });
+
+    test('feat. with & — Green & Gold (feat. Charlotte Plank & Riko Dan)', () => {
+        const result = parseArtists('Green & Gold (feat. Charlotte Plank & Riko Dan)');
+        assert.ok(result.includes('Charlotte Plank'));
+        assert.ok(result.includes('Riko Dan'));
+    });
+
+    test('feat. with & — Ram Pam (feat. Mystic Marley & Flowdan)', () => {
+        const result = parseArtists('Ram Pam (feat. Mystic Marley & Flowdan)');
+        assert.ok(result.includes('Mystic Marley'));
+        assert.ok(result.includes('Flowdan'));
+    });
+
+    test('feat. with & — 96 (feat. Shapes & Dada Jones)', () => {
+        const result = parseArtists('96 (feat. Shapes & Dada Jones)');
+        assert.ok(result.includes('Shapes'));
+        assert.ok(result.includes('Dada Jones'));
+    });
+
+    test('remixer name with X — No Tomorrow (P Money X Whiney Remix)', () => {
+        const result = parseArtists('No Tomorrow (P Money X Whiney Remix)');
+        assert.ok(result.includes('P Money X Whiney'));
+    });
+
+    test('simple feat. — Sleepwalking (feat. Songer)', () => {
+        const result = parseArtists('Sleepwalking (feat. Songer)');
+        assert.ok(result.includes('Songer'));
+    });
+
+    test('simple feat. — Alibi (feat. Rudimental)', () => {
+        const result = parseArtists('Alibi (feat. Rudimental)');
+        assert.ok(result.includes('Rudimental'));
+    });
+});
+
 describe('TSV format (Beatport export)', () => {
     test('tab-separated with Track Title and Artist columns', () => {
         const input = [
