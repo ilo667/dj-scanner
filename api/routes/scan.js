@@ -142,18 +142,6 @@ router.post('/youtube', scanLimiter, async (req, res) => {
     });
 });
 
-let _appleMusicToken = null;
-let _appleMusicTokenExpiry = 0;
-
-function decodeJwtExpiry(token) {
-    try {
-        const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
-        return payload.exp || 0;
-    } catch {
-        return 0;
-    }
-}
-
 function extractJwt(text) {
     const matches = [...text.matchAll(/eyJ[A-Za-z0-9\-_]+\.eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+/g)];
 
@@ -172,21 +160,14 @@ function extractJwt(text) {
 }
 
 async function getAppleMusicToken() {
-    if (_appleMusicToken && Date.now() < _appleMusicTokenExpiry) {
-        return _appleMusicToken;
-    }
-
     const res = await fetch('https://music.apple.com/', {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
+        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+        signal: AbortSignal.timeout(5000)
     });
     const html = await res.text();
     const inlineToken = extractJwt(html);
 
-    if (inlineToken) {
-        _appleMusicToken = inlineToken;
-        _appleMusicTokenExpiry = decodeJwtExpiry(inlineToken) * 1000 - 60000;
-        return _appleMusicToken;
-    }
+    if (inlineToken) return inlineToken;
 
     const scriptUrls = [...html.matchAll(/src="([^"]+\.js[^"]*)"/g)].map(m => {
         const src = m[1];
@@ -197,14 +178,10 @@ async function getAppleMusicToken() {
 
     for (const url of scriptUrls) {
         try {
-            const jsRes = await fetch(url);
+            const jsRes = await fetch(url, { signal: AbortSignal.timeout(5000) });
             const js = await jsRes.text();
             const token = extractJwt(js);
-            if (token) {
-                _appleMusicToken = token;
-                _appleMusicTokenExpiry = decodeJwtExpiry(token) * 1000 - 60000;
-                return _appleMusicToken;
-            }
+            if (token) return token;
         } catch {}
     }
 
@@ -255,12 +232,12 @@ router.post('/apple-music', scanLimiter, async (req, res) => {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Origin': 'https://music.apple.com'
-                }
+                },
+                signal: AbortSignal.timeout(8000)
             });
 
             if (response.status === 401) {
-                _appleMusicToken = null;
-                return res.status(500).json({ error: 'Apple Music token expired. Please retry.' });
+                return res.status(500).json({ error: 'Could not connect to Apple Music. Please retry.' });
             }
 
             if (!response.ok) {
