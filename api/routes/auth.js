@@ -19,15 +19,7 @@ const registerLimiter = rateLimit({
 
 const router = Router();
 
-const COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 3 * 24 * 60 * 60 * 1000
-};
-
-const HINT_COOKIE_OPTIONS = {
-    httpOnly: false,
+const BASE_COOKIE_OPTIONS = {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 3 * 24 * 60 * 60 * 1000
@@ -40,8 +32,8 @@ function setAuthCookies(res, user) {
         { expiresIn: '3d' }
     );
 
-    res.cookie('token', token, COOKIE_OPTIONS);
-    res.cookie('logged_in', JSON.stringify({ email: user.email, role: user.role }), HINT_COOKIE_OPTIONS);
+    res.cookie('token', token, { ...BASE_COOKIE_OPTIONS, httpOnly: true });
+    res.cookie('logged_in', JSON.stringify({ email: user.email, role: user.role }), { ...BASE_COOKIE_OPTIONS, httpOnly: false });
 }
 
 router.post('/register', registerLimiter, async (req, res) => {
