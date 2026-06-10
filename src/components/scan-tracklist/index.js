@@ -14,6 +14,7 @@ export default function ScanTracklist() {
     const [activeIntegration, setActiveIntegration] = React.useState(null);
     const [integrationUrl, setIntegrationUrl] = React.useState('');
     const location = useLocation();
+    const integrationsRef = React.useRef(null);
 
     React.useEffect(() => {
         setArtists([]);
@@ -46,6 +47,19 @@ export default function ScanTracklist() {
 
         if (img) setFile(img);
     }
+
+    React.useEffect(() => {
+        if (!activeIntegration) return;
+
+        function handleClick(e) {
+            if (integrationsRef.current && !integrationsRef.current.contains(e.target)) {
+                setActiveIntegration(null);
+                setIntegrationUrl('');
+            }
+        }
+        document.addEventListener('click', handleClick);
+        return () => document.removeEventListener('click', handleClick);
+    }, [activeIntegration]);
 
     function toggleIntegration(id) {
         setActiveIntegration(prev => prev === id ? null : id);
@@ -148,7 +162,7 @@ export default function ScanTracklist() {
                     {!previewUrl && (
                         <>
                             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Scan from playlist</p>
-                            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
+                            <div ref={integrationsRef} className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
                                 {INTEGRATIONS.map(integration => (
                                     <div key={integration.id} className="relative w-full sm:w-auto">
                                         <button
@@ -184,13 +198,21 @@ export default function ScanTracklist() {
                                                             Scan
                                                         </button>
                                                     </div>
-                                                ) : (
+                                                ) : integration.id === 'spotify' ? (
                                                     <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
                                                         <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
                                                         <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
                                                         <li>Знайди потрібний плейлист в списку</li>
                                                         <li>Натисни <strong>Export</strong> — завантажиться <code>.csv</code> файл</li>
                                                         <li>Прикріпи його нижче через <strong>Attach File</strong></li>
+                                                    </ol>
+                                                ) : (
+                                                    <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
+                                                        <li>Відкрий <strong>rekordbox</strong></li>
+                                                        <li>Перейди до <strong>Playlists</strong></li>
+                                                        <li>Правий клік на плейлист → <strong>Export a playlist to a file</strong></li>
+                                                        <li>Обери <strong>Export a playlist to a file (*.txt)</strong></li>
+                                                        <li>Прикріпи файл через <strong>Attach File</strong></li>
                                                     </ol>
                                                 )}
                                             </div>
@@ -241,7 +263,7 @@ export default function ScanTracklist() {
                                             onChange={(e) => setFile(e.target.files?.[0] || null)}
                                         />
                                     </label>
-                                        <p className="text-[10px] text-gray-500">CUE · TXT (Rekordbox) · CSV (Spotify)</p>
+                                        <p className="text-[10px] text-gray-500">CUE · TXT (rekordbox) · CSV (Spotify)</p>
                                     </div>
                                 </div>
                             )}

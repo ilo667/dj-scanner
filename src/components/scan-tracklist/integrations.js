@@ -41,6 +41,14 @@ const INTEGRATIONS = [
         type: 'guide',
     },
     {
+        id: 'rekordbox',
+        label: 'Scan rekordbox',
+        btnClass: 'bg-[#000000] hover:bg-[#222222] pl-11',
+        icon: '/rekordbox-icon.png',
+        iconStyle: { left: '16px', height: '20px', width: 'auto' },
+        type: 'guide',
+    },
+    {
         id: 'youtube',
         label: 'Scan YouTube Music',
         btnClass: 'bg-[#FF0033] hover:bg-[#cc0029] pl-[54px]',
