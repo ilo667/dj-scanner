@@ -43,47 +43,53 @@ export default function Register() {
 
     return (
         <div className="w-full max-w-sm m-auto mt-16 px-4">
-            <h1 className="text-2xl font-bold mb-6">Register</h1>
-            <form onSubmit={onSubmit} className="flex flex-col gap-4">
-                <input
-                    type="email"
-                    placeholder="Email"
-                    aria-label="Email"
-                    required
-                    className="rounded-md border border-gray-400 px-4 py-3 outline-none"
-                    value={form.email}
-                    onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    aria-label="Password"
-                    required
-                    className="rounded-md border border-gray-400 px-4 py-3 outline-none"
-                    value={form.password}
-                    onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                />
-                <input
-                    type="password"
-                    placeholder="Confirm password"
-                    aria-label="Confirm password"
-                    required
-                    className="rounded-md border border-gray-400 px-4 py-3 outline-none"
-                    value={form.confirmPassword}
-                    onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                />
-                {error && <p role="alert" className="text-red-600">{error}</p>}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="rounded-md bg-[#0057b8] p-3 font-semibold text-white hover:bg-[#00438e] disabled:opacity-50"
-                >
-                    {loading ? 'Registering...' : 'Register'}
-                </button>
-                <p className="text-sm text-center">
-                    Already have an account? <Link to="/login" className="text-[#0057b8] underline">Login</Link>
-                </p>
-            </form>
+            <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
+                <h1 className="text-2xl font-bold mb-6 text-gray-900">Register</h1>
+                <form onSubmit={onSubmit} className="flex flex-col gap-4">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        aria-label="Email"
+                        required
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        value={form.email}
+                        onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        aria-label="Password"
+                        required
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        value={form.password}
+                        onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirm password"
+                        aria-label="Confirm password"
+                        required
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        value={form.confirmPassword}
+                        onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                    />
+                    {error && (
+                        <div>
+                            <p role="alert" className="text-sm font-medium text-red-500">{error}</p>
+                        </div>
+                    )}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="rounded-lg bg-[#2563eb] p-3 font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
+                    >
+                        {loading ? 'Registering...' : 'Register'}
+                    </button>
+                    <p className="text-sm text-center text-gray-500">
+                        Already have an account? <Link to="/login" className="text-blue-600 underline">Login</Link>
+                    </p>
+                </form>
+            </div>
         </div>
     );
 }

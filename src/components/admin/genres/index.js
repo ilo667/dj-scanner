@@ -84,49 +84,55 @@ export default function AdminGenres() {
         }
     }
 
-    if (genresLoading) return <div className="text-center mt-16">Loading...</div>;
+    if (genresLoading) return <div className="text-center mt-16 text-gray-300">Loading...</div>;
 
     return (
-        <div className="w-2/3 m-auto mt-10">
-            <h1 className="text-2xl font-bold mb-6">Genres</h1>
+        <div className="max-w-xl mx-auto mt-10 px-4">
+            <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
+                <h1 className="text-2xl font-bold mb-6 text-gray-900">Genres</h1>
 
-            <form onSubmit={addGenre} className="flex gap-2 mb-8">
-                <input
-                    type="text"
-                    placeholder="Genre name"
-                    aria-label="Genre name"
-                    className="flex-1 rounded-md border border-gray-400 px-4 py-2 outline-none"
-                    value={newGenre}
-                    onChange={e => setNewGenre(e.target.value)}
-                />
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="rounded-md bg-[#0057b8] px-6 py-2 font-semibold text-white hover:bg-[#00438e] disabled:opacity-50"
-                >
-                    Add
-                </button>
-            </form>
+                <form onSubmit={addGenre} className="flex gap-2 mb-8">
+                    <input
+                        type="text"
+                        placeholder="Genre name"
+                        aria-label="Genre name"
+                        className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        value={newGenre}
+                        onChange={e => setNewGenre(e.target.value)}
+                    />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
+                    >
+                        Add
+                    </button>
+                </form>
 
-            {error && <p role="alert" className="text-red-600 mb-4">{error}</p>}
+                {error && (
+                    <div className="mb-4">
+                        <p role="alert" className="text-sm font-medium text-red-500">{error}</p>
+                    </div>
+                )}
 
-            <ul className="divide-y divide-gray-200">
-                {genres.map(genre => (
-                    <li key={genre.id} className="flex items-center justify-between py-2">
-                        <span>{genre.name}</span>
-                        <button
-                            onClick={() => deleteGenre(genre.id)}
-                            className="text-sm text-red-600 hover:underline"
-                        >
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
+                <ul className="divide-y divide-gray-100">
+                    {genres.map(genre => (
+                        <li key={genre.id} className="flex items-center justify-between py-3">
+                            <span className="text-gray-800">{genre.name}</span>
+                            <button
+                                onClick={() => deleteGenre(genre.id)}
+                                className="text-sm text-red-500 hover:text-red-700 transition-colors"
+                            >
+                                Delete
+                            </button>
+                        </li>
+                    ))}
+                </ul>
 
-            {!genresLoading && genres.length === 0 && (
-                <p className="text-gray-500 mt-4">No genres yet</p>
-            )}
+                {!genresLoading && genres.length === 0 && (
+                    <p className="text-gray-400 mt-4">No genres yet</p>
+                )}
+            </div>
         </div>
     );
 }

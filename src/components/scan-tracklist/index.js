@@ -32,26 +32,19 @@ export default function ScanTracklist() {
 
     React.useEffect(() => {
         return () => {
-            if (previewUrl) {
-                URL.revokeObjectURL(previewUrl);
-            }
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
         };
     }, [previewUrl]);
 
     function onPaste(e) {
         const item = [...(e.clipboardData?.items || [])].find(i => i.type.includes('image'));
 
-        if (!item) {
-            return;
-        }
-
+        if (!item) return;
         e.preventDefault();
 
         const img = item.getAsFile();
 
-        if (img) {
-            setFile(img);
-        }
+        if (img) setFile(img);
     }
 
     function toggleIntegration(id) {
@@ -115,11 +108,7 @@ export default function ScanTracklist() {
                 const formData = new FormData();
 
                 formData.append('file', file);
-
-                response = await fetch('/api/scan', {
-                    method: 'POST',
-                    body: formData
-                });
+                response = await fetch('/api/scan', { method: 'POST', body: formData });
             } else {
                 response = await fetch('/api/scan', {
                     method: 'POST',
@@ -153,18 +142,19 @@ export default function ScanTracklist() {
     }
 
     return (
-        <div>
+        <div className="max-w-2xl mx-auto mt-8 px-4">
             {!artists.length && !loading && (
-                <form className="w-2/3 m-auto" onSubmit={onSubmit}>
+                <form className="bg-gray-200 rounded-2xl shadow-xl p-8" onSubmit={onSubmit}>
                     {!previewUrl && (
-                        <div>
-                            <div className="mt-4 mb-2 flex flex-wrap gap-3">
+                        <>
+                            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Scan from playlist</p>
+                            <div className="flex flex-wrap gap-2 mb-6">
                                 {INTEGRATIONS.map(integration => (
                                     <div key={integration.id} className="relative">
                                         <button
                                             type="button"
                                             onClick={() => toggleIntegration(integration.id)}
-                                            className={`relative inline-flex items-center rounded-md ${integration.btnClass} pr-4 py-2 font-semibold text-white`}
+                                            className={`relative inline-flex items-center rounded-lg ${integration.btnClass} pr-4 py-2 text-sm font-medium text-white`}
                                         >
                                             <img
                                                 src={integration.icon}
@@ -174,7 +164,7 @@ export default function ScanTracklist() {
                                             {integration.label}
                                         </button>
                                         {activeIntegration === integration.id && (
-                                            <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                            <div className="absolute top-full left-0 mt-2 z-10 w-[26rem] rounded-xl border border-gray-100 bg-white p-4 shadow-xl">
                                                 {integration.type === 'url' ? (
                                                     <div className="flex gap-2">
                                                         <input
@@ -182,24 +172,24 @@ export default function ScanTracklist() {
                                                             value={integrationUrl}
                                                             onChange={(e) => setIntegrationUrl(e.target.value)}
                                                             placeholder={integration.placeholder}
-                                                            className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-3 py-2 text-sm outline-none focus:border-blue-400"
                                                             onKeyDown={(e) => e.key === 'Enter' && onIntegrationSubmit(integration)}
                                                         />
                                                         <button
                                                             type="button"
                                                             onClick={() => onIntegrationSubmit(integration)}
                                                             disabled={loading}
-                                                            className={`rounded-md ${integration.scanBtnClass} px-4 py-2 font-semibold text-white disabled:opacity-50`}
+                                                            className={`rounded-lg ${integration.scanBtnClass} px-4 py-2 text-sm font-semibold text-white disabled:opacity-50`}
                                                         >
                                                             Scan
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <ol className="list-decimal pl-5 space-y-1">
+                                                    <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
                                                         <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
                                                         <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
                                                         <li>Знайди потрібний плейлист в списку</li>
-                                                        <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
+                                                        <li>Натисни <strong>Export</strong> — завантажиться <code>.csv</code> файл</li>
                                                         <li>Прикріпи його нижче через <strong>Attach File</strong></li>
                                                     </ol>
                                                 )}
@@ -208,77 +198,68 @@ export default function ScanTracklist() {
                                     </div>
                                 ))}
                             </div>
-                              <textarea rows="12"
-                                        cols="20"
-                                        aria-label="Tracklist"
-                                        placeholder="Add tracklist or paste image screenshot"
-                                        className="peer mt-4 block w-full appearance-none rounded-md border
-                              border-gray-400 pb-2 ps-4 pt-3 text-gray-900 placeholder-light-gray outline-none validate"
-                                        value={trackListInput}
-                                        onChange={(e) => setTrackListInput(e.target.value)}
-                                        onPaste={onPaste}
-                              ></textarea>
-                            {confirmTrackList && (
-                                <span className="text-[#ff0000]">Please review scanned text and correct artist names if needed</span>
-                            )}
-                            {!confirmTrackList && (
-                                <>
-                                    <span>
-                                        <strong>Text format:</strong>
-                                        <br/>
-                                        01. Artist - Track
-                                        <br/>
-                                        1. Artist - Track
-                                        <br/>
-                                        Artist - Track
-                                        <br/>
-                                    </span>
-                                    <br/>
-                                    <span>Or <strong>Attach File</strong></span>
-                                    <br/>
-                                    <input type="file"
-                                        aria-label="Upload tracklist file"
-                                        className="w-full md:w-auto"
-                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                    />
-                                    <div className="mt-5">
-                                        <strong>Screenshot tips:</strong>
-                                        <ul className="list-disc pl-5">
-                                            <li>Use list view - one track per line</li>
-                                            <li>Make sure track names are not cut off</li>
-                                            <li>Clear font, good contrast (light on dark or dark on light)</li>
-                                            <li>No UI elements overlapping the text</li>
-                                        </ul>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
-                    {previewUrl && !parsing && (
-                        <div className="mt-4">
-                            <img
-                                src={previewUrl}
-                                alt="Screenshot preview"
-                                className="max-w-full rounded border
-                              border-gray-400"
+
+                            <div className="relative my-6">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-400" />
+                                </div>
+                                <div className="relative flex justify-center">
+                                    <span className="bg-gray-200 px-4 text-sm text-gray-600">or paste tracklist</span>
+                                </div>
+                            </div>
+
+                            <textarea
+                                rows="6"
+                                aria-label="Tracklist"
+                                placeholder="Artist - Track"
+                                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-blue-400 focus:bg-white transition-colors resize-y"
+                                value={trackListInput}
+                                onChange={(e) => setTrackListInput(e.target.value)}
+                                onPaste={onPaste}
                             />
+
+                            {confirmTrackList && (
+                                <p className="mt-2 text-sm text-amber-600 font-medium">Please review scanned text and correct artist names if needed</p>
+                            )}
+
+                            {!confirmTrackList && (
+                                <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
+                                    <p className="text-xs text-gray-600">Formats: Artist - Track · CUE · TXT (Recordbox)</p>
+                                    <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                        </svg>
+                                        {file ? file.name : 'Attach File'}
+                                        <input
+                                            type="file"
+                                            aria-label="Upload tracklist file"
+                                            className="hidden"
+                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                        />
+                                    </label>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {previewUrl && !parsing && (
+                        <div className="space-y-3">
+                            <img src={previewUrl} alt="Screenshot preview" className="max-w-full rounded-lg border border-gray-200" />
                             <button
                                 type="button"
-                                className="mt-2 rounded px-3 py-1 text-sm bg-gray-100 hover:bg-[#ddddde]"
+                                className="rounded-lg px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
                                 onClick={() => setFile(null)}
                             >
                                 Remove image
                             </button>
                             <button
-                                className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#00438e] mt-4"
+                                className="w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
                                 type="button"
                                 onClick={async () => {
                                     setParsing(true);
                                     setError(null);
-
                                     try {
                                         const text = await ocrImageToText(file);
-
                                         setTrackListInput(text);
                                         setFile(null);
                                         setConfirmTrackList(true);
@@ -290,56 +271,58 @@ export default function ScanTracklist() {
                                     }
                                 }}
                             >
-                                <span className="inline-block w-full">Read text from image</span>
+                                Read text from image
                             </button>
                         </div>
                     )}
+
+                    {error && (
+                        <div className="mt-4">
+                            <p role="alert" className="text-sm font-medium text-red-500">{error}</p>
+                        </div>
+                    )}
+
                     {!previewUrl && (
                         <button
-                            className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#00438e] mt-4"
+                            className="mt-5 w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
                             type="submit"
                         >
-                            <span className="inline-block w-full">Scan playlist</span>
+                            Scan playlist
                         </button>
                     )}
                 </form>
             )}
 
-            {error && (
-                <div className="w-2/3 m-auto mt-4">
-                    <p role="alert" className="text-red-600 font-medium">{error}</p>
-                </div>
-            )}
-
-            <div aria-live="polite" className="text-center mt-6">
-                {loading && <p className="text-lg font-semibold">Scanning playlist...</p>}
-                {parsing && <p className="text-lg font-semibold">Reading text from image...</p>}
+            <div aria-live="polite" className="mt-8 text-center">
+                {loading && <p className="text-gray-300 font-medium">Scanning playlist...</p>}
+                {parsing && <p className="text-gray-300 font-medium">Reading text from image...</p>}
             </div>
 
             {artists.length > 0 && !loading && (
-                <div className="w-2/3 m-auto mt-6 p-4">
-                    <h2 className="text-xl font-semibold mb-3">Artists found:</h2>
-                    <ul className="list-disc pl-6">
+                <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-1">Artists found</h2>
+                    <p className="text-sm text-gray-400 mb-5">{artists.length} artists · {artists.filter(a => a.blacklisted).length} flagged</p>
+                    <ul className="divide-y divide-gray-100">
                         {artists.map((artist, index) => (
-                            <li key={index} className="py-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span style={{ color: artist.blacklisted ? '#ff0000' : '#000000', fontWeight: artist.blacklisted ? '700' : '400' }}>
-                                        {artist.name}
-                                        {artist.countries.length > 0 && (
-                                            <span className="text-[10px] font-normal ml-1" style={{ color: artist.blacklisted ? '#ff0000' : '#555555' }}>
-                                                {' '}({artist.countries.join(', ')})
-                                            </span>
-                                        )}
-                                    </span>
-                                    {artist.blacklisted && (
-                                        <span className="text-red-600">- remove from playlist!</span>
+                            <li key={index} className="py-2.5 flex items-center gap-3 flex-wrap">
+                                <span className={artist.blacklisted ? 'text-red-600 font-semibold' : 'text-gray-800'}>
+                                    {artist.name}
+                                    {artist.countries.length > 0 && (
+                                        <span className={`text-xs font-normal ml-1.5 ${artist.blacklisted ? 'text-red-400' : 'text-gray-400'}`}>
+                                            ({artist.countries.join(', ')})
+                                        </span>
                                     )}
-                                </div>
+                                </span>
+                                {artist.blacklisted && (
+                                    <span className="text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                                        remove from playlist
+                                    </span>
+                                )}
                             </li>
                         ))}
                     </ul>
                     <button
-                        className="w-full rounded-[6px] bg-[#0057b8] p-4 text-center font-semibold text-white hover:bg-[#004590] mt-4"
+                        className="mt-6 w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
                         onClick={() => {
                             setArtists([]);
                             setTrackListInput('');

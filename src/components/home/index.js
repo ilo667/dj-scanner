@@ -2,27 +2,24 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
     return (
-        <div className="p-5">
-            <h1 className="mb-4 text-3xl font-bold tracking-tight">DJ Scanner - ваш помічник у редагуванні плейлистів</h1>
-            <p>Що на данний час вміє DJ Scanner:</p>
-            <ul className="list-disc list-inside mb-5">
-                <li>Читання треклістів із <strong>CUE-файлів та TXT-експорту з Rekordbox</strong></li>
-                <li>Ручне введення треклістів через <strong>поле</strong></li>
-                <li>Розпізнавання тексту зі <strong>скріншотів і зображень</strong></li>
-                <li>Імпорт плейлистів із <strong>Spotify через Exportify CSV</strong> і сканування</li>
-                <li>Імпорт плейлистів із <strong>YouTube та YouTube Music</strong> за посиланням</li>
-                <li>Імпорт плейлистів із <strong>Apple Music</strong> за посиланням</li>
-                <li>Імпорт плейлистів із <strong>Deezer</strong> за посиланням</li>
-                <li>Імпорт плейлистів із <strong>SoundCloud</strong> за посиланням</li>
-                <li>Автоматичне визначення <strong>артистів та їх країн</strong></li>
-                <li>Швидка перевірка та <strong>фільтрація небажаних виконавців</strong></li>
-                <li>Перегляд і фільтрація виконавців за <strong>жанрами</strong> для залогінених користувачів</li>
-            </ul>
+        <div className="max-w-2xl mx-auto mt-10 px-4">
+            <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
+                <h1 className="mb-4 text-2xl font-bold text-gray-900 tracking-tight">DJ Scanner - ваш помічник у редагуванні плейлистів</h1>
+                <p className="text-gray-600 mb-3">Що вміє DJ Scanner:</p>
+                <ul className="list-disc list-inside mb-6 space-y-1.5 text-gray-700">
+                    <li>Підтримка форматів: <strong>CUE, TXT (Rekordbox)</strong>, ручне введення</li>
+                    <li>Розпізнавання тексту зі <strong>скріншотів (OCR)</strong></li>
+                    <li>Імпорт із <strong>Spotify, YouTube, Apple Music, Deezer, SoundCloud</strong> за посиланням</li>
+                    <li>Автоматичне визначення <strong>країни виконавця</strong></li>
+                    <li>Перевірка плейлиста на <strong>небажаних виконавців</strong></li>
+                    <li>Фільтрація за <strong>жанрами</strong> для авторизованих користувачів</li>
+                </ul>
 
-            <Link to="/scan"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#0057b8] px-6 py-2 text-lg font-semibold text-white hover:bg-[#00438e]">
-                Scan Tracklist
-            </Link>
+                <Link to="/scan"
+                      className="inline-flex items-center justify-center rounded-lg bg-[#2563eb] px-6 py-3 text-base font-semibold text-white hover:bg-[#1d4ed8] transition-colors">
+                    Scan Tracklist
+                </Link>
+            </div>
         </div>
     );
 }
