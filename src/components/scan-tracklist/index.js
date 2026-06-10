@@ -164,7 +164,7 @@ export default function ScanTracklist() {
                                             {integration.label}
                                         </button>
                                         {activeIntegration === integration.id && (
-                                            <div className="absolute top-full left-0 mt-2 z-10 w-[26rem] rounded-xl border border-gray-100 bg-white p-4 shadow-xl">
+                                            <div className="absolute top-full left-0 mt-2 z-10 w-[26rem] rounded-xl border border-gray-300 bg-gray-100 p-4 shadow-xl">
                                                 {integration.type === 'url' ? (
                                                     <div className="flex gap-2">
                                                         <input
@@ -212,7 +212,7 @@ export default function ScanTracklist() {
                                 rows="6"
                                 aria-label="Tracklist"
                                 placeholder="Artist - Track"
-                                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-blue-400 focus:bg-white transition-colors resize-y"
+                                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-blue-400 transition-colors resize-y"
                                 value={trackListInput}
                                 onChange={(e) => setTrackListInput(e.target.value)}
                                 onPaste={onPaste}
@@ -224,8 +224,8 @@ export default function ScanTracklist() {
 
                             {!confirmTrackList && (
                                 <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
-                                    <p className="text-xs text-gray-600">Formats: Artist - Track · CUE · TXT (Recordbox)</p>
-                                    <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                                    <p className="text-xs text-gray-600">Formats: Artist - Track · CUE · TXT (Rekordbox)</p>
+                                    <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-300 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>

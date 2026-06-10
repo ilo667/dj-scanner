@@ -183,7 +183,7 @@ export default function Admin() {
                         placeholder="Artist name"
                         aria-label="Artist name"
                         required
-                        className="flex-1 min-w-[200px] rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        className="flex-1 min-w-[200px] rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 transition-colors"
                         value={newArtist}
                         onChange={e => setNewArtist(e.target.value)}
                     />

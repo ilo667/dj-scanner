@@ -34,7 +34,7 @@ export default function Login() {
                         placeholder="Email"
                         aria-label="Email"
                         required
-                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 transition-colors"
                         value={form.email}
                         onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     />
@@ -43,7 +43,7 @@ export default function Login() {
                         placeholder="Password"
                         aria-label="Password"
                         required
-                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-3 outline-none focus:border-blue-400 transition-colors"
                         value={form.password}
                         onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                     />

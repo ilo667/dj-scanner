@@ -96,7 +96,7 @@ export default function AdminGenres() {
                         type="text"
                         placeholder="Genre name"
                         aria-label="Genre name"
-                        className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 transition-colors"
                         value={newGenre}
                         onChange={e => setNewGenre(e.target.value)}
                     />
