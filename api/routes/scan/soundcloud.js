@@ -1,5 +1,6 @@
 const { parseArtists, separateArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
+const { formatArtists } = require('../../../utils/format-artists');
 
 async function getSoundCloudClientId() {
     const res = await fetch('https://soundcloud.com/', {
@@ -84,17 +85,9 @@ module.exports = async function handleSoundCloud(req, res) {
         }
 
         const artistList = [...artistSet];
-        const { found, artistCountries, artistBlacklisted } = await checkArtists(artistList);
+        const checkResult = await checkArtists(artistList);
 
-        return res.json({
-            success: true,
-            artists: artistList.map(name => ({
-                name,
-                highlight: found.includes(name),
-                blacklisted: artistBlacklisted[name.toLowerCase()] ?? false,
-                countries: artistCountries[name.toLowerCase()] || []
-            }))
-        });
+        return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to fetch SoundCloud playlist' });

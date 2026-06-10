@@ -1,5 +1,6 @@
 const { parseArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
+const { formatArtists } = require('../../../utils/format-artists');
 
 module.exports = async function handleDeezer(req, res) {
     const { url } = req.body;
@@ -50,15 +51,7 @@ module.exports = async function handleDeezer(req, res) {
     }
 
     const artistList = [...artistSet];
-    const { found, artistCountries, artistBlacklisted } = await checkArtists(artistList);
+    const checkResult = await checkArtists(artistList);
 
-    return res.json({
-        success: true,
-        artists: artistList.map(name => ({
-            name,
-            highlight: found.includes(name),
-            blacklisted: artistBlacklisted[name.toLowerCase()] ?? false,
-            countries: artistCountries[name.toLowerCase()] || []
-        }))
-    });
+    return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
 };

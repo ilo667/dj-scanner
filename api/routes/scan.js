@@ -3,6 +3,7 @@ const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 const { parseArtists } = require('../../utils/parser');
 const { checkArtists } = require('../../utils/artists-check');
+const { formatArtists } = require('../../utils/format-artists');
 const handleYoutube = require('./scan/youtube');
 const handleAppleMusic = require('./scan/apple-music');
 const handleDeezer = require('./scan/deezer');
@@ -32,17 +33,9 @@ router.post('/', scanLimiter, upload.single('file'), async (req, res) => {
         }
 
         const artists = parseArtists(text);
-        const { found, artistCountries, artistBlacklisted } = await checkArtists(artists);
+        const checkResult = await checkArtists(artists);
 
-        return res.json({
-            success: true,
-            artists: artists.map(name => ({
-                name,
-                highlight: found.includes(name),
-                blacklisted: artistBlacklisted[name.toLowerCase()] ?? false,
-                countries: artistCountries[name.toLowerCase()] || []
-            }))
-        });
+        return res.json({ success: true, artists: formatArtists(artists, checkResult) });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to parse input' });
