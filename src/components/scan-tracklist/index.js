@@ -148,13 +148,13 @@ export default function ScanTracklist() {
                     {!previewUrl && (
                         <>
                             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Scan from playlist</p>
-                            <div className="flex flex-wrap gap-2 mb-6">
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
                                 {INTEGRATIONS.map(integration => (
-                                    <div key={integration.id} className="relative">
+                                    <div key={integration.id} className="relative w-full sm:w-auto">
                                         <button
                                             type="button"
                                             onClick={() => toggleIntegration(integration.id)}
-                                            className={`relative inline-flex items-center rounded-lg ${integration.btnClass} pr-4 py-2 text-sm font-medium text-white`}
+                                            className={`relative inline-flex items-center w-full sm:w-auto rounded-lg ${integration.btnClass} pr-4 py-2 text-sm font-medium text-white`}
                                         >
                                             <img
                                                 src={integration.icon}
@@ -204,7 +204,7 @@ export default function ScanTracklist() {
                                     <div className="w-full border-t border-gray-400" />
                                 </div>
                                 <div className="relative flex justify-center">
-                                    <span className="bg-gray-200 px-4 text-sm text-gray-600">or paste tracklist</span>
+                                    <span className="bg-gray-200 px-4 text-sm text-gray-600">or paste tracklist/screenshot</span>
                                 </div>
                             </div>
 
@@ -223,9 +223,13 @@ export default function ScanTracklist() {
                             )}
 
                             {!confirmTrackList && (
-                                <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
-                                    <p className="text-xs text-gray-600">Formats: Artist - Track · CUE · TXT (Rekordbox)</p>
-                                    <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-300 transition-colors">
+                                <div className="mt-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                    <div>
+                                        <p className="text-xs text-gray-600">Format: Artist - Track</p>
+                                        <p className="text-xs text-gray-500 mt-1">Для скріншоту: list view · один трек на рядок · без обрізань</p>
+                                    </div>
+                                    <div className="flex flex-col items-start sm:items-end gap-1">
+                                        <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-300 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>
@@ -237,6 +241,8 @@ export default function ScanTracklist() {
                                             onChange={(e) => setFile(e.target.files?.[0] || null)}
                                         />
                                     </label>
+                                        <p className="text-[10px] text-gray-500">CUE · TXT (Rekordbox) · CSV (Spotify)</p>
+                                    </div>
                                 </div>
                             )}
                         </>
