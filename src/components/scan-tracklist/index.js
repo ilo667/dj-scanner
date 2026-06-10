@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ocrImageToText } from '../../utils/ocr';
+import INTEGRATIONS from './integrations';
 
 export default function ScanTracklist() {
     const [trackListInput, setTrackListInput] = React.useState('');
@@ -10,15 +11,8 @@ export default function ScanTracklist() {
     const [parsing, setParsing] = React.useState(false);
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const [spotifyGuideOpen, setSpotifyGuideOpen] = React.useState(false);
-    const [youtubeOpen, setYoutubeOpen] = React.useState(false);
-    const [youtubeUrl, setYoutubeUrl] = React.useState('');
-    const [appleMusicOpen, setAppleMusicOpen] = React.useState(false);
-    const [appleMusicUrl, setAppleMusicUrl] = React.useState('');
-    const [deezerOpen, setDeezerOpen] = React.useState(false);
-    const [deezerUrl, setDeezerUrl] = React.useState('');
-    const [soundcloudOpen, setSoundcloudOpen] = React.useState(false);
-    const [soundcloudUrl, setSoundcloudUrl] = React.useState('');
+    const [activeIntegration, setActiveIntegration] = React.useState(null);
+    const [integrationUrl, setIntegrationUrl] = React.useState('');
     const location = useLocation();
 
     React.useEffect(() => {
@@ -27,15 +21,8 @@ export default function ScanTracklist() {
         setFile(null);
         setError(null);
         setConfirmTrackList(false);
-        setSpotifyGuideOpen(false);
-        setYoutubeOpen(false);
-        setYoutubeUrl('');
-        setAppleMusicOpen(false);
-        setAppleMusicUrl('');
-        setDeezerOpen(false);
-        setDeezerUrl('');
-        setSoundcloudOpen(false);
-        setSoundcloudUrl('');
+        setActiveIntegration(null);
+        setIntegrationUrl('');
     }, [location.key]);
 
     const previewUrl = React.useMemo(() => {
@@ -67,51 +54,22 @@ export default function ScanTracklist() {
         }
     }
 
-    async function onDeezerSubmit() {
-        if (!deezerUrl.trim()) return;
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await fetch('/api/scan/deezer', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: deezerUrl.trim() })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(response.status === 429
-                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
-                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
-                );
-                return;
-            }
-
-            setArtists(data.artists);
-            setDeezerUrl('');
-            setDeezerOpen(false);
-        } catch (err) {
-            console.error(err);
-            setError('Something went wrong while scanning playlist. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+    function toggleIntegration(id) {
+        setActiveIntegration(prev => prev === id ? null : id);
+        setIntegrationUrl('');
     }
 
-    async function onSoundCloudSubmit() {
-        if (!soundcloudUrl.trim()) return;
+    async function onIntegrationSubmit(integration) {
+        if (!integrationUrl.trim()) return;
 
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch('/api/scan/soundcloud', {
+            const response = await fetch(integration.endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: soundcloudUrl.trim() })
+                body: JSON.stringify({ url: integrationUrl.trim() })
             });
 
             const data = await response.json();
@@ -125,76 +83,8 @@ export default function ScanTracklist() {
             }
 
             setArtists(data.artists);
-            setSoundcloudUrl('');
-            setSoundcloudOpen(false);
-        } catch (err) {
-            console.error(err);
-            setError('Something went wrong while scanning playlist. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function onAppleMusicSubmit() {
-        if (!appleMusicUrl.trim()) return;
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await fetch('/api/scan/apple-music', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: appleMusicUrl.trim() })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(response.status === 429
-                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
-                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
-                );
-                return;
-            }
-
-            setArtists(data.artists);
-            setAppleMusicUrl('');
-            setAppleMusicOpen(false);
-        } catch (err) {
-            console.error(err);
-            setError('Something went wrong while scanning playlist. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function onYoutubeSubmit() {
-        if (!youtubeUrl.trim()) return;
-
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await fetch('/api/scan/youtube', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: youtubeUrl.trim() })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(response.status === 429
-                    ? (data.error || 'Too many scan requests. Please try again in 15 minutes.')
-                    : (data.error || 'Something went wrong while scanning playlist. Please try again.')
-                );
-                return;
-            }
-
-            setArtists(data.artists);
-            setYoutubeUrl('');
-            setYoutubeOpen(false);
+            setIntegrationUrl('');
+            setActiveIntegration(null);
         } catch (err) {
             console.error(err);
             setError('Something went wrong while scanning playlist. Please try again.');
@@ -263,151 +153,54 @@ export default function ScanTracklist() {
                     {!previewUrl && (
                         <div>
                             <div className="mt-4 mb-2 flex flex-wrap gap-3">
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setAppleMusicOpen(h => !h); setSpotifyGuideOpen(false); setYoutubeOpen(false); setDeezerOpen(false); setSoundcloudOpen(false); }}
-                                        className="relative inline-flex items-center rounded-md bg-[#ff4e6b] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
-                                    >
-                                        <img src="/apple-music-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
-                                        Scan Apple Music
-                                    </button>
-                                    {appleMusicOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={appleMusicUrl}
-                                                    onChange={(e) => setAppleMusicUrl(e.target.value)}
-                                                    placeholder="https://music.apple.com/ua/playlist/..."
-                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={onAppleMusicSubmit}
-                                                    className="rounded-md bg-[#ff4e6b] px-4 py-2 font-semibold text-white hover:bg-[#e6334f]"
-                                                >
-                                                    Scan
-                                                </button>
+                                {INTEGRATIONS.map(integration => (
+                                    <div key={integration.id} className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleIntegration(integration.id)}
+                                            className={`relative inline-flex items-center rounded-md ${integration.btnClass} pr-4 py-2 font-semibold text-white`}
+                                        >
+                                            <img
+                                                src={integration.icon}
+                                                alt=""
+                                                style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', ...integration.iconStyle }}
+                                            />
+                                            {integration.label}
+                                        </button>
+                                        {activeIntegration === integration.id && (
+                                            <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
+                                                {integration.type === 'url' ? (
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="url"
+                                                            value={integrationUrl}
+                                                            onChange={(e) => setIntegrationUrl(e.target.value)}
+                                                            placeholder={integration.placeholder}
+                                                            className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
+                                                            onKeyDown={(e) => e.key === 'Enter' && onIntegrationSubmit(integration)}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onIntegrationSubmit(integration)}
+                                                            disabled={loading}
+                                                            className={`rounded-md ${integration.scanBtnClass} px-4 py-2 font-semibold text-white disabled:opacity-50`}
+                                                        >
+                                                            Scan
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <ol className="list-decimal pl-5 space-y-1">
+                                                        <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
+                                                        <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
+                                                        <li>Знайди потрібний плейлист в списку</li>
+                                                        <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
+                                                        <li>Прикріпи його нижче через <strong>Attach File</strong></li>
+                                                    </ol>
+                                                )}
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setDeezerOpen(h => !h); setAppleMusicOpen(false); setSpotifyGuideOpen(false); setYoutubeOpen(false); setSoundcloudOpen(false); }}
-                                        className="relative inline-flex items-center rounded-md bg-[#A238FF] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#8a2de6]"
-                                    >
-                                        <img src="/deezer-icon.png" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
-                                        Scan Deezer
-                                    </button>
-                                    {deezerOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={deezerUrl}
-                                                    onChange={(e) => setDeezerUrl(e.target.value)}
-                                                    placeholder="https://www.deezer.com/en/playlist/..."
-                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
-                                                    onKeyDown={(e) => e.key === 'Enter' && onDeezerSubmit()}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={onDeezerSubmit}
-                                                    disabled={loading}
-                                                    className="rounded-md bg-[#A238FF] px-4 py-2 font-semibold text-white hover:bg-[#8a2de6] disabled:opacity-50"
-                                                >
-                                                    Scan
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setSoundcloudOpen(h => !h); setAppleMusicOpen(false); setDeezerOpen(false); setSpotifyGuideOpen(false); setYoutubeOpen(false); }}
-                                        className="relative inline-flex items-center rounded-md bg-[#FF5500] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#e64d00]"
-                                    >
-                                        <img src="/soundcloud-icon.png" alt="" style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', height: 'auto', width: '35px' }} />
-                                        Scan SoundCloud
-                                    </button>
-                                    {soundcloudOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={soundcloudUrl}
-                                                    onChange={(e) => setSoundcloudUrl(e.target.value)}
-                                                    placeholder="https://soundcloud.com/.../sets/..."
-                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
-                                                    onKeyDown={(e) => e.key === 'Enter' && onSoundCloudSubmit()}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={onSoundCloudSubmit}
-                                                    disabled={loading}
-                                                    className="rounded-md bg-[#FF5500] px-4 py-2 font-semibold text-white hover:bg-[#e64d00] disabled:opacity-50"
-                                                >
-                                                    Scan
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setSpotifyGuideOpen(h => !h); setYoutubeOpen(false); setAppleMusicOpen(false); setDeezerOpen(false); setSoundcloudOpen(false); }}
-                                        className="relative inline-flex items-center rounded-md bg-[#1ED760] pl-11 pr-4 py-2 font-semibold text-white hover:bg-[#1abc54]"
-                                    >
-                                        <img src="/spotify-icon.svg" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: '20px', width: '20px' }} />
-                                        Scan Spotify
-                                    </button>
-                                    {spotifyGuideOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <ol className="list-decimal pl-5 space-y-1">
-                                                <li>Зайди на <a href="https://exportify.net" target="_blank" rel="noreferrer" className="text-blue-600 underline">exportify.net</a></li>
-                                                <li>Натисни <strong>Get Started</strong> та залогінься Spotify акаунтом</li>
-                                                <li>Знайди потрібний плейлист в списку</li>
-                                                <li>Натисни <strong>Export</strong> - завантажиться <code>.csv</code> файл</li>
-                                                <li>Прикріпи його нижче через <strong>Attach File</strong></li>
-                                            </ol>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => { setYoutubeOpen(h => !h); setSpotifyGuideOpen(false); setAppleMusicOpen(false); setDeezerOpen(false); setSoundcloudOpen(false); }}
-                                        className="relative inline-flex items-center rounded-md bg-[#FF0033] pl-[54px] pr-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
-                                    >
-                                        <img src="/youtube-icon.png" alt="" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', height: 'auto', width: '31px' }} />
-                                        Scan YouTube Music
-                                    </button>
-                                    {youtubeOpen && (
-                                        <div className="absolute top-full left-0 mt-1 z-10 w-[26rem] rounded-md border border-gray-300 bg-gray-50 p-4 text-sm shadow-md">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={youtubeUrl}
-                                                    onChange={(e) => setYoutubeUrl(e.target.value)}
-                                                    placeholder="https://music.youtube.com/playlist?list=..."
-                                                    className="flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm outline-none"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={onYoutubeSubmit}
-                                                    className="rounded-md bg-[#FF0033] px-4 py-2 font-semibold text-white hover:bg-[#cc0029]"
-                                                >
-                                                    Scan
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                               <textarea rows="12"
                                         cols="20"
