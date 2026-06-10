@@ -63,7 +63,7 @@ router.post('/artists', ...requireAdmin(), async (req, res) => {
         return res.status(201).json({ success: true, artist });
     } catch (error) {
         if (error.code === '23505') {
-            return res.status(400).json({ error: 'Artist already exists' });
+            return res.status(409).json({ error: 'Artist already exists' });
         }
         if (error.code === '23503') {
             return res.status(400).json({ error: 'Invalid country ID' });
