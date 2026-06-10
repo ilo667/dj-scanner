@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { requireAuth, requireRole } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const pool = require('../../utils/database');
 
 const router = Router();
@@ -34,7 +34,7 @@ router.get('/artists', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
+router.post('/artists', ...requireAdmin(), async (req, res) => {
     try {
         const { name, genre_id, country_ids = [] } = req.body;
 
@@ -73,7 +73,7 @@ router.post('/artists', requireAuth, requireRole('admin'), async (req, res) => {
     }
 });
 
-router.delete('/artists/:id', requireAuth, requireRole('admin'), async (req, res) => {
+router.delete('/artists/:id', ...requireAdmin(), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
 

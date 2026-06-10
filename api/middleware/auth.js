@@ -24,4 +24,8 @@ function requireRole(...roles) {
     };
 }
 
-module.exports = { requireAuth, requireRole };
+function requireAdmin() {
+    return [requireAuth, requireRole('admin')];
+}
+
+module.exports = { requireAuth, requireRole, requireAdmin };

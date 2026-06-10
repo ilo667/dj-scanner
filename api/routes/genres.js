@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { requireAuth, requireRole } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { getGenres, createGenre, deleteGenre } = require('../../utils/genres');
 
 const router = Router();
@@ -14,7 +14,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/', requireAuth, requireRole('admin'), async (req, res) => {
+router.post('/', ...requireAdmin(), async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -34,7 +34,7 @@ router.post('/', requireAuth, requireRole('admin'), async (req, res) => {
     }
 });
 
-router.delete('/:id', requireAuth, requireRole('admin'), async (req, res) => {
+router.delete('/:id', ...requireAdmin(), async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
 
