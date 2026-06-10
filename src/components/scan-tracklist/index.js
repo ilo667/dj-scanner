@@ -98,12 +98,18 @@ export default function ScanTracklist() {
 
         if (!trackListInput.trim() && !file) return;
 
+        const trackList = trackListInput.trim();
+
+        if (!file && !trackList.includes(' - ')) {
+            setError('Invalid format. Use: Artist - Track');
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
             let response;
-            let trackList = trackListInput.trim();
 
             if (file) {
                 const formData = new FormData();
