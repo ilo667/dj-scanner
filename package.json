@@ -8,7 +8,8 @@
     "node-start": "node api/index.ts",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:parser": "node --test utils/parser.test.js",
+    "test:parser": "node --test tests/parser.test.js",
+    "test:auth": "node --test tests/auth.test.js",
     "eject": "react-scripts eject"
   },
   "keywords": [],
