@@ -1,6 +1,6 @@
 const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
-const { parseArtists, separateArtists } = require('./parser');
+const { parseArtists, separateArtists } = require('../utils/parser');
 
 describe('plain text format', () => {
     test('Artist - Track', () => {

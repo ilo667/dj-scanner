@@ -20,7 +20,7 @@ export default function Header() {
                 {user ? (
                     <>
                         <li>
-                            <Link to="/admin/blacklist">Blacklist</Link>
+                            <Link to="/admin">Admin</Link>
                         </li>
                         <li>
                             <button onClick={onLogout} className="underline">

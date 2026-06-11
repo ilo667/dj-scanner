@@ -3,8 +3,9 @@ import Home from './components/home';
 import Login from './components/account/login';
 import Register from './components/account/register';
 import ScanTracklist from './components/scan-tracklist';
-import Admin from './components/admin';
+import AdminBlacklist from './components/admin/blacklist';
 import AdminGenres from './components/admin/genres';
+import Admin from './components/admin';
 import Header from './components/header';
 import NotFound from './components/not-found';
 
@@ -17,8 +18,8 @@ export function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
                 <Route path="scan" element={<ScanTracklist />} />
-                {/* TODO: /admin should become a menu page with links to blacklist, whitelist, genres */}
-                <Route path="admin/blacklist" element={<Admin />} />
+                <Route path="admin" element={<Admin />} />
+                <Route path="admin/blacklist" element={<AdminBlacklist />} />
                 <Route path="admin/genres" element={<AdminGenres />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
