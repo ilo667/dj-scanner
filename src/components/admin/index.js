@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/auth';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 export default function Admin() {
     const { user } = useAuth();
