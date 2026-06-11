@@ -18,7 +18,7 @@ export default function Admin() {
     return (
         <div className="max-w-xl mx-auto mt-10 px-4">
             <h1 className="text-2xl font-bold text-gray-200 mb-6">Admin</h1>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col space-y-4">
                 {items.map(({ to, label, description }) => (
                     <Link
                         key={to}

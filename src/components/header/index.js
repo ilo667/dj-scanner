@@ -13,7 +13,7 @@ export default function Header() {
     return (
         <nav className="justify-between flex bg-[#0a0f1e] px-6 py-4 text-gray-200 flex-wrap border-b border-[#1e1e2e]">
             <Link to="/" className="text-3xl font-bold">DJ Scanner</Link>
-            <ul className="flex items-center gap-3 sm:gap-4">
+            <ul className="flex items-center space-x-3 sm:space-x-4">
                 <li>
                     <Link to="/scan">Scan Tracklist</Link>
                 </li>

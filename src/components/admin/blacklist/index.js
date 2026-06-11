@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../context/auth';
+import Loader from '../../loader';
 
 export default function AdminBlacklist() {
     const { user } = useAuth();
@@ -151,7 +152,7 @@ export default function AdminBlacklist() {
     const selectedGenreId = genreParam ? parseInt(genreParam) : defaultFilters?.genre_id;
 
     if (loading) {
-        return <div className="text-center mt-16 text-gray-300">Loading...</div>;
+        return <Loader />;
     }
 
     return (
@@ -160,12 +161,12 @@ export default function AdminBlacklist() {
                 <h1 className="text-2xl font-bold mb-6 text-gray-900">Artists blacklist</h1>
 
                 {genres.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-6">
+                    <div className="flex flex-wrap mb-4">
                         {genres.map(genre => (
                             <div
                                 key={genre.id}
                                 onClick={() => handleChipClick(genre)}
-                                className={`px-4 py-1 rounded-lg text-sm cursor-pointer border transition-colors ${
+                                className={`mr-2 mb-2 px-4 py-1 rounded-lg text-sm cursor-pointer border transition-colors ${
                                     genre.id === selectedGenreId
                                         ? 'bg-[#2563eb] text-white border-[#2563eb]'
                                         : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200 hover:text-gray-900'
@@ -177,17 +178,17 @@ export default function AdminBlacklist() {
                     </div>
                 )}
 
-                {user?.role === 'admin' && <form onSubmit={addArtist} className="flex flex-wrap gap-2 mb-8 items-center">
+                {user?.role === 'admin' && <form onSubmit={addArtist} className="flex flex-wrap mb-6 items-center">
                     <input
                         type="text"
                         placeholder="Artist name"
                         aria-label="Artist name"
                         required
-                        className="flex-1 min-w-[200px] rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 transition-colors"
+                        className="flex-1 min-w-[200px] mr-2 mb-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 transition-colors"
                         value={newArtist}
                         onChange={e => setNewArtist(e.target.value)}
                     />
-                    <div className="relative">
+                    <div className="relative mr-2 mb-2">
                         <select
                             value={newArtistGenre}
                             onChange={e => setNewArtistGenre(e.target.value)}
@@ -208,7 +209,7 @@ export default function AdminBlacklist() {
                         size={2}
                         value={newArtistCountries}
                         onChange={e => setNewArtistCountries(Array.from(e.target.selectedOptions, o => o.value))}
-                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 px-4 py-2 outline-none"
+                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 px-4 py-2 outline-none mr-2 mb-2"
                     >
                         <option value="141">Russia</option>
                         {countries.filter(c => c.id !== 141).map(c => (
@@ -217,7 +218,7 @@ export default function AdminBlacklist() {
                     </select>
                     <button
                         type="submit"
-                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-medium text-white hover:bg-[#1d4ed8] transition-colors mb-2"
                     >
                         Add
                     </button>
