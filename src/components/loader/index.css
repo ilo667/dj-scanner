@@ -1,0 +1,33 @@
+.dj-loader {
+    animation: dj-spin 1.2s linear infinite;
+    background:
+            conic-gradient(
+                    from 0deg,
+                    #9b5cff,
+                    #22d3ee,
+                    transparent 45%,
+                    transparent 100%
+            );
+    border-radius: 50%;
+    filter: drop-shadow(0 0 24px #22d3ee) drop-shadow(0 0 8px #9b5cff);
+    height: 90px;
+    mask-image: radial-gradient(farthest-side, transparent 72%, #000 73%);
+    -webkit-mask-image: radial-gradient(farthest-side, transparent 72%, #000 73%); /* stylelint-disable-line */
+    position: relative;
+    width: 90px;
+}
+
+.dj-loader::after {
+    animation: dj-spin 3s linear infinite reverse;
+    border: 2px dashed rgba(155, 92, 255, 0.45);
+    border-radius: 50%;
+    content: '';
+    inset: -12px;
+    mask-image: none;
+    -webkit-mask-image: none;
+    position: absolute;
+}
+
+@keyframes dj-spin {
+    to { transform: rotate(360deg); }
+}

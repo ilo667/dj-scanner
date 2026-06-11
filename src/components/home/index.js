@@ -16,7 +16,7 @@ export default function Home() {
                 </ul>
 
                 <Link to="/scan"
-                      className="inline-flex items-center justify-center rounded-lg bg-[#2563eb] px-6 py-3 text-base font-semibold text-white hover:bg-[#1d4ed8] transition-colors">
+                      className="inline-flex items-center justify-center rounded-lg bg-[#2563eb] px-6 py-3 text-base font-medium text-white hover:bg-[#1d4ed8] transition-colors">
                     Scan Tracklist
                 </Link>
             </div>

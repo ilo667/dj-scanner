@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/auth';
+import Loader from '../../loader';
 
 export default function AdminGenres() {
     const { user } = useAuth();
@@ -84,14 +85,16 @@ export default function AdminGenres() {
         }
     }
 
-    if (genresLoading) return <div className="text-center mt-16 text-gray-300">Loading...</div>;
+    if (genresLoading) {
+        return <Loader />;
+    }
 
     return (
         <div className="max-w-xl mx-auto mt-10 px-4">
             <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
                 <h1 className="text-2xl font-bold mb-6 text-gray-900">Genres</h1>
 
-                <form onSubmit={addGenre} className="flex gap-2 mb-8">
+                <form onSubmit={addGenre} className="flex space-x-2 mb-8">
                     <input
                         type="text"
                         placeholder="Genre name"

@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ocrImageToText } from '../../utils/ocr';
 import INTEGRATIONS from './integrations';
+import Loader from '../loader';
 
 export default function ScanTracklist() {
     const [trackListInput, setTrackListInput] = React.useState('');
@@ -157,14 +158,14 @@ export default function ScanTracklist() {
 
     return (
         <div className="max-w-2xl mx-auto mt-8 px-4">
-            {!artists.length && !loading && (
+            {!artists.length && !loading && !parsing && (
                 <form className="bg-gray-200 rounded-2xl shadow-xl p-8" onSubmit={onSubmit}>
                     {!previewUrl && (
                         <>
-                            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Scan from playlist</p>
-                            <div ref={integrationsRef} className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
+                            <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-3">Scan from playlist</p>
+                            <div ref={integrationsRef} className="flex flex-col sm:flex-row sm:flex-wrap mb-4">
                                 {INTEGRATIONS.map(integration => (
-                                    <div key={integration.id} className="relative w-full sm:w-auto">
+                                    <div key={integration.id} className="relative w-full sm:w-auto mb-2 sm:mr-2">
                                         <button
                                             type="button"
                                             onClick={() => toggleIntegration(integration.id)}
@@ -180,7 +181,7 @@ export default function ScanTracklist() {
                                         {activeIntegration === integration.id && (
                                             <div className="absolute top-full left-0 mt-2 z-10 w-[26rem] rounded-xl border border-gray-300 bg-gray-100 p-4 shadow-xl">
                                                 {integration.type === 'url' ? (
-                                                    <div className="flex gap-2">
+                                                    <div className="flex space-x-2">
                                                         <input
                                                             type="url"
                                                             value={integrationUrl}
@@ -221,8 +222,8 @@ export default function ScanTracklist() {
                                 ))}
                             </div>
 
-                            <div className="relative my-6">
-                                <div className="absolute inset-0 flex items-center">
+                            <div className="relative mt-4 mb-6">
+                                <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center">
                                     <div className="w-full border-t border-gray-400" />
                                 </div>
                                 <div className="relative flex justify-center">
@@ -245,17 +246,17 @@ export default function ScanTracklist() {
                             )}
 
                             {!confirmTrackList && (
-                                <div className="mt-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                <div className="mt-3 flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-3 sm:space-y-0">
                                     <div>
                                         <p className="text-xs text-gray-600">Format: Artist - Track</p>
                                         <p className="text-xs text-gray-500 mt-1">Для скріншоту: list view · один трек на рядок · без обрізань</p>
                                     </div>
-                                    <div className="flex flex-col items-start sm:items-end gap-1">
-                                        <label className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-300 transition-colors">
+                                    <div className="flex flex-col items-start sm:items-end space-y-1">
+                                        <label className="cursor-pointer inline-flex items-center space-x-2 rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-300 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>
-                                        {file ? file.name : 'Attach File'}
+                                        <span>{file ? file.name : 'Attach File'}</span>
                                         <input
                                             type="file"
                                             aria-label="Upload tracklist file"
@@ -312,7 +313,7 @@ export default function ScanTracklist() {
 
                     {!previewUrl && (
                         <button
-                            className="mt-5 w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                            className="mt-5 w-full rounded-lg bg-[#2563eb] py-3 font-medium text-white hover:bg-[#1d4ed8] transition-colors"
                             type="submit"
                         >
                             Scan playlist
@@ -321,19 +322,18 @@ export default function ScanTracklist() {
                 </form>
             )}
 
-            <div aria-live="polite" className="mt-8 text-center">
-                {loading && <p className="text-gray-300 font-medium">Scanning playlist...</p>}
-                {parsing && <p className="text-gray-300 font-medium">Reading text from image...</p>}
+            <div aria-live="polite">
+                {(loading || parsing) && <Loader />}
             </div>
 
             {artists.length > 0 && !loading && (
                 <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-1">Artists found</h2>
+                    <h2 className="text-lg font-medium text-gray-900 mb-1">Artists found</h2>
                     <p className="text-sm text-gray-400 mb-5">{artists.length} artists · {artists.filter(a => a.blacklisted).length} flagged</p>
                     <ul className="divide-y divide-gray-100">
                         {artists.map((artist, index) => (
-                            <li key={index} className="py-2.5 flex items-center gap-3 flex-wrap">
-                                <span className={artist.blacklisted ? 'text-red-600 font-semibold' : 'text-gray-800'}>
+                            <li key={index} className="py-2.5 flex items-center flex-wrap space-x-3">
+                                <span className={artist.blacklisted ? 'text-red-600 font-medium' : 'text-gray-800'}>
                                     {artist.name}
                                     {artist.countries.length > 0 && (
                                         <span className={`text-xs font-normal ml-1.5 ${artist.blacklisted ? 'text-red-400' : 'text-gray-400'}`}>
@@ -342,7 +342,7 @@ export default function ScanTracklist() {
                                     )}
                                 </span>
                                 {artist.blacklisted && (
-                                    <span className="text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                                    <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
                                         remove from playlist
                                     </span>
                                 )}
@@ -350,7 +350,7 @@ export default function ScanTracklist() {
                         ))}
                     </ul>
                     <button
-                        className="mt-6 w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                        className="mt-6 w-full rounded-lg bg-[#2563eb] py-3 font-medium text-white hover:bg-[#1d4ed8] transition-colors"
                         onClick={() => {
                             setArtists([]);
                             setTrackListInput('');

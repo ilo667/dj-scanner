@@ -45,7 +45,7 @@ export default function Register() {
         <div className="w-full max-w-sm m-auto mt-16 px-4">
             <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
                 <h1 className="text-2xl font-bold mb-6 text-gray-900">Register</h1>
-                <form onSubmit={onSubmit} className="flex flex-col gap-4">
+                <form onSubmit={onSubmit} className="flex flex-col space-y-4">
                     <input
                         type="email"
                         placeholder="Email"
