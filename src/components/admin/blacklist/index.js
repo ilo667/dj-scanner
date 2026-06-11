@@ -218,7 +218,7 @@ export default function AdminBlacklist() {
                     </select>
                     <button
                         type="submit"
-                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-semibold text-white hover:bg-[#1d4ed8] transition-colors mb-2"
+                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-medium text-white hover:bg-[#1d4ed8] transition-colors mb-2"
                     >
                         Add
                     </button>
