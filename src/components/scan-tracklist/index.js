@@ -179,7 +179,7 @@ export default function ScanTracklist() {
                                             {integration.label}
                                         </button>
                                         {activeIntegration === integration.id && (
-                                            <div className="absolute top-full left-0 mt-2 z-10 w-[26rem] rounded-xl border border-gray-300 bg-gray-100 p-4 shadow-xl">
+                                            <div className="mt-2 sm:p-4 sm:rounded-xl sm:border sm:border-gray-300 sm:bg-gray-100 sm:shadow-xl sm:absolute sm:top-full sm:left-0 sm:w-[26rem] sm:z-10">
                                                 {integration.type === 'url' ? (
                                                     <div className="flex space-x-2">
                                                         <input
