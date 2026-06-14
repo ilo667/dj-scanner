@@ -194,7 +194,7 @@ export default function ScanTracklist() {
                                                             type="button"
                                                             onClick={() => onIntegrationSubmit(integration)}
                                                             disabled={loading}
-                                                            className={`rounded-lg ${integration.scanBtnClass} px-4 py-2 text-sm font-semibold text-white disabled:opacity-50`}
+                                                            className={`rounded-lg ${integration.scanBtnClass} px-4 py-2 text-sm font-medium text-white disabled:opacity-50`}
                                                         >
                                                             Scan
                                                         </button>
@@ -282,7 +282,7 @@ export default function ScanTracklist() {
                                 Remove image
                             </button>
                             <button
-                                className="w-full rounded-lg bg-[#2563eb] py-3 font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                                className="w-full rounded-lg bg-[#2563eb] py-3 font-medium text-white hover:bg-[#1d4ed8] transition-colors"
                                 type="button"
                                 onClick={async () => {
                                     setParsing(true);

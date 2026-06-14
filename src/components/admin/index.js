@@ -25,7 +25,7 @@ export default function Admin() {
                         to={to}
                         className="block bg-gray-200 hover:bg-gray-300 rounded-2xl shadow-xl px-6 py-4 text-gray-900 transition-colors"
                     >
-                        <div className="font-semibold text-lg">{label}</div>
+                        <div className="font-medium text-lg">{label}</div>
                         <div className="text-gray-600 text-sm mt-1">{description}</div>
                     </Link>
                 ))}

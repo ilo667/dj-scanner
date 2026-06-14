@@ -55,7 +55,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="rounded-lg bg-[#2563eb] p-3 font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
+                        className="rounded-lg bg-[#2563eb] p-3 font-medium text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>

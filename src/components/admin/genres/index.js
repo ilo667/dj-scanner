@@ -106,7 +106,7 @@ export default function AdminGenres() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-semibold text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
+                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-medium text-white hover:bg-[#1d4ed8] disabled:opacity-50 transition-colors"
                     >
                         Add
                     </button>
