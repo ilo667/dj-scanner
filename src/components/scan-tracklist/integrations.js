@@ -51,10 +51,10 @@ const INTEGRATIONS = [
     {
         id: 'youtube',
         label: 'Scan YouTube Music',
-        btnClass: 'bg-[#FF0033] hover:bg-[#cc0029] pl-[54px]',
+        btnClass: 'bg-[#FF0033] hover:bg-[#cc0029] pl-11',
         scanBtnClass: 'bg-[#FF0033] hover:bg-[#cc0029]',
         icon: '/youtube-icon.png',
-        iconStyle: { left: '16px', height: 'auto', width: '31px' },
+        iconStyle: { left: '10px', height: 'auto', width: '31px' },
         placeholder: 'https://music.youtube.com/playlist?list=...',
         endpoint: '/api/scan/youtube',
         type: 'url',
