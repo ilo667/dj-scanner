@@ -521,3 +521,27 @@ describe('separateArtists — used for Apple Music artistName and YouTube channe
         assert.deepEqual(separateArtists('Sub Focus'), ['Sub Focus']);
     });
 });
+
+describe('timecoded tracklist format', () => {
+    const input = [
+        '00:30 A.M.C - Let It Roll 2024 Intro',
+        '01:17 Sota - Machete (A.M.C Remix OG Machete VIP)',
+        '03:14 Turno - Gametime Level 1',
+        '04:45 Noisia - Get Deaded (Fade Black)',
+        '1:05:27 Sub Focus - Siren',
+    ].join('\n');
+
+    test('extracts artists correctly', () => {
+        const result = parseArtists(input);
+        assert.ok(result.includes('A.M.C'), 'A.M.C');
+        assert.ok(result.includes('Sota'), 'Sota');
+        assert.ok(result.includes('Turno'), 'Turno');
+        assert.ok(result.includes('Noisia'), 'Noisia');
+        assert.ok(result.includes('Sub Focus'), 'Sub Focus');
+    });
+
+    test('no timestamp in artist names', () => {
+        const result = parseArtists(input);
+        assert.ok(!result.some(a => /^\d+:\d+/.test(a)), 'no timestamp in artist names');
+    });
+});
