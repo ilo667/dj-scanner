@@ -119,7 +119,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     }
 });
 
-router.post('/google', async (req, res) => {
+router.post('/google', loginLimiter, async (req, res) => {
     try {
         const { credential } = req.body;
         if (!credential) return res.status(400).json({ error: 'Missing credential' });
