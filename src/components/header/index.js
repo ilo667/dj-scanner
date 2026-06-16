@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/auth';
+import NavItems from './nav-items';
 
 export default function Header() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const navRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (menuOpen && navRef.current && !navRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        }
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [menuOpen]);
 
     async function onLogout() {
         await logout();
@@ -14,20 +26,12 @@ export default function Header() {
     }
 
     return (
-        <nav className="relative bg-[#0a0f1e] px-6 py-4 text-gray-200 border-b border-[#1e1e2e] flex justify-between items-center">
+        <nav ref={navRef} className="relative bg-[#0a0f1e] px-6 py-4 text-gray-200 border-b border-[#1e1e2e] flex justify-between items-center">
             <Link to="/" className="text-3xl font-bold">DJ Scanner</Link>
 
             {/* Desktop nav */}
             <ul className="hidden sm:flex items-center space-x-4">
-                <li><Link to="/scan">Scan Tracklist</Link></li>
-                {user ? (
-                    <>
-                        <li><Link to="/admin">Admin</Link></li>
-                        <li><button onClick={onLogout} className="underline">Logout ({user.email})</button></li>
-                    </>
-                ) : (
-                    <li><Link to="/login">Login</Link></li>
-                )}
+                <NavItems user={user} onLogout={onLogout} onClose={() => {}} />
             </ul>
 
             {/* Mobile burger button */}
@@ -49,32 +53,13 @@ export default function Header() {
 
             {/* Mobile dropdown */}
             {menuOpen && (
-                <ul className="sm:hidden absolute top-full right-4 w-48 bg-[#020817] ring-1 ring-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex flex-col z-50 overflow-hidden">
-                    <li>
-                        <Link to="/scan" onClick={() => setMenuOpen(false)} className="block px-5 py-3 text-gray-300 hover:bg-white/5 hover:text-white transition-colors border-b border-white/10">
-                            Scan Tracklist
-                        </Link>
-                    </li>
-                    {user ? (
-                        <>
-                            <li>
-                                <Link to="/admin" onClick={() => setMenuOpen(false)} className="block px-5 py-3 text-gray-300 hover:bg-white/5 hover:text-white transition-colors border-b border-white/10">
-                                    Admin
-                                </Link>
-                            </li>
-                            <li>
-                                <button onClick={onLogout} className="w-full text-left px-5 py-3 text-gray-400 hover:bg-white/5 hover:text-white transition-colors text-sm">
-                                    Logout ({user.email})
-                                </button>
-                            </li>
-                        </>
-                    ) : (
-                        <li>
-                            <Link to="/login" onClick={() => setMenuOpen(false)} className="block px-5 py-3 text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-                                Login
-                            </Link>
-                        </li>
-                    )}
+                <ul className="absolute top-full right-4 w-48 bg-[#020817] ring-1 ring-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex flex-col z-50 overflow-hidden">
+                    <NavItems
+                        user={user}
+                        onLogout={onLogout}
+                        onClose={() => setMenuOpen(false)}
+                        liClass="block px-5 py-3 text-gray-300 hover:bg-white/5 hover:text-white transition-colors border-b border-white/10"
+                    />
                 </ul>
             )}
         </nav>
