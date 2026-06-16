@@ -22,6 +22,7 @@ export default function Register() {
         }
 
         setLoading(true);
+        document.activeElement?.blur();
 
         try {
             const res = await fetch('/api/auth/register', {

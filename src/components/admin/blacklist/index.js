@@ -8,15 +8,11 @@ export default function AdminBlacklist() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [artists, setArtists] = React.useState([]);
-    const [newArtist, setNewArtist] = React.useState('');
-    const [newArtistGenre, setNewArtistGenre] = React.useState('');
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
     const [genres, setGenres] = React.useState([]);
     const [genresLoaded, setGenresLoaded] = React.useState(false);
     const [defaultFilters, setDefaultFilters] = React.useState(null);
-    const [countries, setCountries] = React.useState([]);
-    const [newArtistCountries, setNewArtistCountries] = React.useState(['141']);
 
     React.useEffect(() => {
         if (!user) {
@@ -25,7 +21,6 @@ export default function AdminBlacklist() {
         }
 
         fetchGenres();
-        fetchCountries();
     }, [user]);
 
     React.useEffect(() => {
@@ -35,9 +30,6 @@ export default function AdminBlacklist() {
 
         setDefaultFilters({ genre_id: dnb?.id ?? null });
 
-        const firstGenre = genres.find(g => g.name !== 'All Genres');
-
-        if (firstGenre) setNewArtistGenre(String(firstGenre.id));
     }, [genresLoaded]);
 
     React.useEffect(() => {
@@ -48,17 +40,6 @@ export default function AdminBlacklist() {
 
         fetchArtists(genreId);
     }, [defaultFilters, searchParams]);
-
-    async function fetchCountries() {
-        try {
-            const res = await fetch('/api/countries', { credentials: 'include' });
-            const data = await res.json();
-
-            setCountries(data);
-        } catch (err) {
-            console.error('Failed to fetch countries:', err);
-        }
-    }
 
     async function fetchGenres() {
         try {
@@ -93,39 +74,6 @@ export default function AdminBlacklist() {
             setSearchParams({});
         } else {
             setSearchParams({ genre: genre.id });
-        }
-    }
-
-    async function addArtist(e) {
-        e.preventDefault();
-        setError(null);
-
-        try {
-            const res = await fetch('/api/admin/artists', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    name: newArtist,
-                    genre_id: newArtistGenre ? parseInt(newArtistGenre) : null,
-                    country_ids: newArtistCountries.map(Number)
-                })
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.error);
-
-            const isAllGenres = genres.find(g => g.id === selectedGenreId)?.name === 'All Genres';
-
-            if (isAllGenres || data.artist.genre_id === selectedGenreId) {
-                setArtists(prev => [...prev, data.artist].sort((a, b) => a.name.localeCompare(b.name)));
-            }
-
-            setNewArtist('');
-            setNewArtistCountries(['141']);
-        } catch (err) {
-            setError(err.message);
         }
     }
 
@@ -177,52 +125,6 @@ export default function AdminBlacklist() {
                         ))}
                     </div>
                 )}
-
-                {user?.role === 'admin' && <form onSubmit={addArtist} className="flex flex-wrap mb-6 items-center">
-                    <input
-                        type="text"
-                        placeholder="Artist name"
-                        aria-label="Artist name"
-                        required
-                        className="flex-1 min-w-[200px] mr-2 mb-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-4 py-2 outline-none focus:border-blue-400 transition-colors"
-                        value={newArtist}
-                        onChange={e => setNewArtist(e.target.value)}
-                    />
-                    <div className="relative mr-2 mb-2">
-                        <select
-                            value={newArtistGenre}
-                            onChange={e => setNewArtistGenre(e.target.value)}
-                            className="appearance-none rounded-lg border border-gray-200 bg-gray-50 text-gray-900 px-4 py-2 pr-8 outline-none cursor-pointer hover:bg-gray-100 transition-colors"
-                        >
-                            {genres.filter(g => g.name !== 'All Genres').map(g => (
-                                <option key={g.id} value={g.id}>{g.name}</option>
-                            ))}
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-                    <select
-                        multiple
-                        size={2}
-                        value={newArtistCountries}
-                        onChange={e => setNewArtistCountries(Array.from(e.target.selectedOptions, o => o.value))}
-                        className="rounded-lg border border-gray-200 bg-gray-50 text-gray-900 px-4 py-2 outline-none mr-2 mb-2"
-                    >
-                        <option value="141">Russia</option>
-                        {countries.filter(c => c.id !== 141).map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                    </select>
-                    <button
-                        type="submit"
-                        className="rounded-lg bg-[#2563eb] px-6 py-2 font-medium text-white hover:bg-[#1d4ed8] transition-colors mb-2"
-                    >
-                        Add
-                    </button>
-                </form>}
 
                 {error && (
                     <div className="mb-4">

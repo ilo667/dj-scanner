@@ -16,6 +16,7 @@ export default function Login() {
         e.preventDefault();
         setError(null);
         setLoading(true);
+        document.activeElement?.blur();
 
         try {
             await login(form.email, form.password);
