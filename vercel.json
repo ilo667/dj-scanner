@@ -8,14 +8,6 @@
 			"config": { "distDir": "build" }
 		}
 	],
-	"headers": [
-		{
-			"source": "/(.*)",
-			"headers": [
-				{ "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" }
-			]
-		}
-	],
 	"routes": [
 		{ "src": "/api/(.*)", "dest": "api/index.ts" },
 		{ "handle": "filesystem" },
