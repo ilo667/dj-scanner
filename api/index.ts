@@ -12,6 +12,10 @@ if (!process.env.YOUTUBE_API_KEY) {
     throw new Error('YOUTUBE_API_KEY environment variable is required');
 }
 
+if (!process.env.GOOGLE_CLIENT_ID) {
+    throw new Error('GOOGLE_CLIENT_ID environment variable is required');
+}
+
 const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
@@ -24,7 +28,7 @@ const countriesRoutes = require('./routes/countries');
 const app = express();
 
 app.set('port', (process.env.PORT || 8081));
-app.use(helmet());
+app.use(helmet({ crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' } }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/scan', scanRoutes);

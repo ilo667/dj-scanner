@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { isEmail } = require('validator');
 const rateLimit = require('express-rate-limit');
+const { OAuth2Client } = require('google-auth-library');
 const pool = require('../../utils/database');
 
 const loginLimiter = rateLimit({
@@ -115,6 +116,31 @@ router.post('/login', loginLimiter, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.post('/google', loginLimiter, async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) return res.status(400).json({ error: 'Missing credential' });
+
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const ticket = await client.verifyIdToken({ idToken: credential, audience: process.env.GOOGLE_CLIENT_ID });
+        const { email } = ticket.getPayload();
+
+        let result = await pool.query('SELECT id, email, role FROM users WHERE email = $1', [email.toLowerCase()]);
+        if (result.rows.length === 0) {
+            result = await pool.query(
+                'INSERT INTO users (email) VALUES ($1) RETURNING id, email, role',
+                [email.toLowerCase()]
+            );
+        }
+
+        setAuthCookies(res, result.rows[0]);
+        return res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ error: 'Google authentication failed' });
     }
 });
 
