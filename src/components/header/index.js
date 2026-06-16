@@ -53,7 +53,7 @@ export default function Header() {
 
             {/* Mobile dropdown */}
             {menuOpen && (
-                <ul className="absolute top-full right-4 w-48 bg-[#020817] ring-1 ring-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex flex-col z-50 overflow-hidden">
+                <ul className="sm:hidden absolute top-full right-4 w-48 bg-[#020817] ring-1 ring-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex flex-col z-50 overflow-hidden">
                     <NavItems
                         user={user}
                         onLogout={onLogout}
