@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../../context/auth';
+import useGoogleAuth from '../../../hooks/useGoogleAuth';
 
 export default function Register() {
     const { refreshUser } = useAuth();
@@ -8,6 +10,7 @@ export default function Register() {
     const [form, setForm] = React.useState({ email: '', password: '', confirmPassword: '' });
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
+    const onGoogleSuccess = useGoogleAuth({ setLoading, setError });
 
     async function onSubmit(e) {
         e.preventDefault();
@@ -85,10 +88,21 @@ export default function Register() {
                     >
                         {loading ? 'Registering...' : 'Register'}
                     </button>
-                    <p className="text-sm text-center text-gray-500">
-                        Already have an account? <Link to="/login" className="text-blue-600 underline">Login</Link>
-                    </p>
                 </form>
+
+                <div className="flex items-center my-4">
+                    <div className="flex-1 border-t border-gray-300" />
+                    <span className="px-3 text-sm text-gray-500">або</span>
+                    <div className="flex-1 border-t border-gray-300" />
+                </div>
+
+                <div className={`flex justify-center ${loading ? 'pointer-events-none opacity-50' : ''}`}>
+                    <GoogleLogin onSuccess={onGoogleSuccess} onError={() => setError('Google login failed')} theme="outline" shape="pill" />
+                </div>
+
+                <p className="text-sm text-center text-gray-500 mt-4">
+                    Already have an account? <Link to="/login" className="text-blue-600 underline">Login</Link>
+                </p>
             </div>
         </div>
     );

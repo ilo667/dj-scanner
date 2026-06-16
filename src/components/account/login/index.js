@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../../context/auth';
+import useGoogleAuth from '../../../hooks/useGoogleAuth';
 
 export default function Login() {
     const { login } = useAuth();
@@ -8,6 +10,7 @@ export default function Login() {
     const [form, setForm] = React.useState({ email: '', password: '' });
     const [error, setError] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
+    const onGoogleSuccess = useGoogleAuth({ setLoading, setError });
 
     async function onSubmit(e) {
         e.preventDefault();
@@ -59,10 +62,21 @@ export default function Login() {
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
-                    <p className="text-sm text-center text-gray-500">
-                        No account? <Link to="/register" className="text-blue-600 underline">Register</Link>
-                    </p>
                 </form>
+
+                <div className="flex items-center my-4">
+                    <div className="flex-1 border-t border-gray-300" />
+                    <span className="px-3 text-sm text-gray-500">або</span>
+                    <div className="flex-1 border-t border-gray-300" />
+                </div>
+
+                <div className={`flex justify-center ${loading ? 'pointer-events-none opacity-50' : ''}`}>
+                    <GoogleLogin onSuccess={onGoogleSuccess} onError={() => setError('Google login failed')} theme="outline" shape="pill" />
+                </div>
+
+                <p className="text-sm text-center text-gray-500 mt-4">
+                    No account? <Link to="/register" className="text-blue-600 underline">Register</Link>
+                </p>
             </div>
         </div>
     );

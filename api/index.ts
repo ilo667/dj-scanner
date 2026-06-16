@@ -24,7 +24,7 @@ const countriesRoutes = require('./routes/countries');
 const app = express();
 
 app.set('port', (process.env.PORT || 8081));
-app.use(helmet());
+app.use(helmet({ crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' } }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/scan', scanRoutes);
