@@ -152,6 +152,9 @@ export default function ScanTracklist() {
             const data = await response.json();
 
             setArtists(data.artists);
+            window.gtag?.('event', 'scan_manual', {
+                method: file ? (file.type.startsWith('image/') ? file.type : file.name.split('.').pop().toLowerCase()) : 'text'
+            });
             setFile(null);
             setTrackListInput('');
             setConfirmTrackList(false);
