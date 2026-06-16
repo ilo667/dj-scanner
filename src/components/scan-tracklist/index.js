@@ -154,9 +154,10 @@ export default function ScanTracklist() {
             const data = await response.json();
 
             setArtists(data.artists);
-            const scanMethod = file ? (file.type.startsWith('image/') ? 'image' : 'file') : (ocrFileType ? 'image' : 'text');
-            const scanDetail = file ? (file.type.startsWith('image/') ? file.type : file.name.split('.').pop().toLowerCase()) : (ocrFileType || undefined);
-            window.gtag?.('event', 'scan_manual', { method: scanMethod, ...(scanDetail && { detail: scanDetail }) });
+            const scanMethod = file
+                ? (file.type.startsWith('image/') ? `image: ${file.type.split('/')[1]}` : `file: ${file.name.split('.').pop().toLowerCase()}`)
+                : (ocrFileType ? `image: ${ocrFileType.split('/')[1]}` : 'text');
+            window.gtag?.('event', 'scan_manual', { method: scanMethod });
             setFile(null);
             setTrackListInput('');
             setConfirmTrackList(false);
