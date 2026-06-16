@@ -12,7 +12,10 @@ export default function Admin() {
 
     const items = [
         { to: '/admin/blacklist', label: 'Blacklist', description: 'View blacklisted artists' },
-        ...(user?.role === 'admin' ? [{ to: '/admin/genres', label: 'Genres', description: 'View genres' }] : []),
+        ...(user?.role === 'admin' ? [
+            { to: '/admin/add-artist', label: 'Add Artist', description: 'Add artist to blacklist' },
+            { to: '/admin/genres', label: 'Genres', description: 'View genres' },
+        ] : []),
     ];
 
     return (

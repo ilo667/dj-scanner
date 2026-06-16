@@ -5,6 +5,7 @@ import Register from './components/account/register';
 import ScanTracklist from './components/scan-tracklist';
 import AdminBlacklist from './components/admin/blacklist';
 import AdminGenres from './components/admin/genres';
+import AdminAddArtist from './components/admin/add-artist';
 import Admin from './components/admin';
 import Header from './components/header';
 import NotFound from './components/not-found';
@@ -20,6 +21,7 @@ export function App() {
                 <Route path="scan" element={<ScanTracklist />} />
                 <Route path="admin" element={<Admin />} />
                 <Route path="admin/blacklist" element={<AdminBlacklist />} />
+                <Route path="admin/add-artist" element={<AdminAddArtist />} />
                 <Route path="admin/genres" element={<AdminGenres />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

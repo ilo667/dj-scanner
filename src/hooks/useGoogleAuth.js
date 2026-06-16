@@ -8,6 +8,7 @@ export default function useGoogleAuth({ setLoading, setError }) {
     async function onGoogleSuccess(credentialResponse) {
         setError(null);
         setLoading(true);
+        document.activeElement?.blur();
 
         try {
             const res = await fetch('/api/auth/google', {
