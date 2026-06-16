@@ -99,6 +99,7 @@ export default function ScanTracklist() {
             setArtists(data.artists);
             setIntegrationUrl('');
             setActiveIntegration(null);
+            window.gtag?.('event', 'scan_integration', { integration: integration.id });
         } catch (err) {
             console.error(err);
             setError('Something went wrong while scanning playlist. Please try again.');
