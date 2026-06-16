@@ -42,7 +42,7 @@ export default function AdminAddArtist() {
                 credentials: 'include',
                 body: JSON.stringify({
                     name: name.trim(),
-                    genre_id: genreId ? parseInt(genreId) : null,
+                    genre_id: genreId ? parseInt(genreId, 10) : null,
                     country_ids: countryIds.map(Number)
                 })
             });
