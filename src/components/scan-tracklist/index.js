@@ -14,6 +14,7 @@ export default function ScanTracklist() {
     const [error, setError] = React.useState(null);
     const [activeIntegration, setActiveIntegration] = React.useState(null);
     const [integrationUrl, setIntegrationUrl] = React.useState('');
+    const [integrationError, setIntegrationError] = React.useState(null);
     const location = useLocation();
     const integrationsRef = React.useRef(null);
 
@@ -65,13 +66,18 @@ export default function ScanTracklist() {
     function toggleIntegration(id) {
         setActiveIntegration(prev => prev === id ? null : id);
         setIntegrationUrl('');
+        setIntegrationError(null);
     }
 
     async function onIntegrationSubmit(integration) {
-        if (!integrationUrl.trim()) return;
+        if (!integrationUrl.trim()) {
+            setIntegrationError('Please enter a URL');
+            return;
+        }
 
         setLoading(true);
         setError(null);
+        setIntegrationError(null);
 
         try {
             const response = await fetch(integration.endpoint, {
@@ -181,23 +187,28 @@ export default function ScanTracklist() {
                                         {activeIntegration === integration.id && (
                                             <div className="mt-2 sm:p-4 sm:rounded-xl sm:border sm:border-gray-300 sm:bg-gray-100 sm:shadow-xl sm:absolute sm:top-full sm:left-0 sm:w-[26rem] sm:z-10">
                                                 {integration.type === 'url' ? (
-                                                    <div className="flex space-x-2">
-                                                        <input
-                                                            type="url"
-                                                            value={integrationUrl}
-                                                            onChange={(e) => setIntegrationUrl(e.target.value)}
-                                                            placeholder={integration.placeholder}
-                                                            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-3 py-2 text-sm outline-none focus:border-blue-400"
-                                                            onKeyDown={(e) => e.key === 'Enter' && onIntegrationSubmit(integration)}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => onIntegrationSubmit(integration)}
-                                                            disabled={loading}
-                                                            className={`rounded-lg ${integration.scanBtnClass} px-4 py-2 text-sm font-medium text-white disabled:opacity-50`}
-                                                        >
-                                                            Scan
-                                                        </button>
+                                                    <div>
+                                                        <div className="flex space-x-2">
+                                                            <input
+                                                                type="url"
+                                                                value={integrationUrl}
+                                                                onChange={(e) => { setIntegrationUrl(e.target.value); setIntegrationError(null); }}
+                                                                placeholder={integration.placeholder}
+                                                                className="flex-1 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                                                                onKeyDown={(e) => e.key === 'Enter' && onIntegrationSubmit(integration)}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => onIntegrationSubmit(integration)}
+                                                                disabled={loading}
+                                                                className={`rounded-lg ${integration.scanBtnClass} px-4 py-2 text-sm font-medium text-white disabled:opacity-50`}
+                                                            >
+                                                                Scan
+                                                            </button>
+                                                        </div>
+                                                        {integrationError && (
+                                                            <p className="mt-1.5 text-xs text-red-500">{integrationError}</p>
+                                                        )}
                                                     </div>
                                                 ) : integration.id === 'spotify' ? (
                                                     <ol className="list-decimal pl-5 space-y-1 text-sm text-gray-600">
@@ -260,8 +271,23 @@ export default function ScanTracklist() {
                                         <input
                                             type="file"
                                             aria-label="Upload tracklist file"
+                                            accept=".cue,.txt,.csv,image/*"
                                             className="hidden"
-                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                            onChange={(e) => {
+                                                const f = e.target.files?.[0];
+
+                                                if (!f) return;
+
+                                                const ext = f.name.split('.').pop().toLowerCase();
+
+                                                if (!['cue', 'txt', 'csv'].includes(ext) && !f.type.startsWith('image/')) {
+                                                    setError('Unsupported file type. Please upload .cue, .txt, .csv, or an image.');
+                                                    e.target.value = '';
+                                                    return;
+                                                }
+                                                setError(null);
+                                                setFile(f);
+                                            }}
                                         />
                                     </label>
                                         <p className="text-[10px] text-gray-500">CUE · TXT (rekordbox) · CSV (Spotify)</p>
