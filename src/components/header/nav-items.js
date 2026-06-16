@@ -8,7 +8,7 @@ export default function NavItems({ user, onLogout, liClass, onClose }) {
                 <>
                     <li><Link to="/admin" onClick={onClose} className={liClass}>Admin</Link></li>
                     <li>
-                        <button onClick={onLogout} className={`w-full text-left ${liClass} text-gray-400 text-sm`}>
+                        <button onClick={onLogout} className={`w-full text-left ${liClass ?? ''} text-gray-400 text-sm`}>
                             Logout ({user.email})
                         </button>
                     </li>
