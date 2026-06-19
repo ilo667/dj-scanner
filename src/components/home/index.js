@@ -12,7 +12,7 @@ export default function Home() {
                     <li>Імпорт із <strong>Spotify, YouTube, Apple Music, Deezer, SoundCloud, rekordbox</strong></li>
                     <li>Автоматичне визначення <strong>країни виконавця</strong></li>
                     <li>Перевірка плейлиста на <strong>небажаних виконавців</strong></li>
-                    <li>Завантаження <strong>небажаних треків</strong> у файл</li>
+                    <li>Експорт <strong>небажаних треків</strong> у файл</li>
                     <li>Фільтрація за <strong>жанрами</strong> для авторизованих користувачів</li>
                 </ul>
 
