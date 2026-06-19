@@ -8,6 +8,7 @@ export default function ScanTracklist() {
     const [trackListInput, setTrackListInput] = React.useState('');
     const [file, setFile] = React.useState(null);
     const [artists, setArtists] = React.useState([]);
+    const [blacklistedTracks, setBlacklistedTracks] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [parsing, setParsing] = React.useState(false);
     const [confirmTrackList, setConfirmTrackList] = React.useState(false);
@@ -21,6 +22,7 @@ export default function ScanTracklist() {
 
     React.useEffect(() => {
         setArtists([]);
+        setBlacklistedTracks([]);
         setTrackListInput('');
         setFile(null);
         setError(null);
@@ -99,6 +101,7 @@ export default function ScanTracklist() {
             }
 
             setArtists(data.artists);
+            setBlacklistedTracks(data.blacklistedTracks ?? []);
             setIntegrationUrl('');
             setActiveIntegration(null);
             window.gtag?.('event', 'scan_integration', { integration: integration.id });
@@ -154,6 +157,7 @@ export default function ScanTracklist() {
             const data = await response.json();
 
             setArtists(data.artists);
+            setBlacklistedTracks(data.blacklistedTracks ?? []);
             const scanMethod = file
                 ? (file.type.startsWith('image/') ? `image: ${file.type.split('/')[1]}` : `file: ${file.name.split('.').pop().toLowerCase()}`)
                 : (ocrFileType ? `image: ${ocrFileType.split('/')[1]}` : 'text');
@@ -379,7 +383,25 @@ export default function ScanTracklist() {
             {artists.length > 0 && !loading && (
                 <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
                     <h2 className="text-lg font-medium text-gray-900 mb-1">Artists found</h2>
-                    <p className="text-sm text-gray-400 mb-5">{artists.length} artists · {artists.filter(a => a.blacklisted).length} flagged</p>
+                    <div className="flex items-center justify-between mb-5">
+                        <p className="text-sm text-gray-400">{artists.length} artists · {artists.filter(a => a.blacklisted).length} flagged</p>
+                        {blacklistedTracks.length > 0 && (
+                            <button
+                                className="inline-flex items-center gap-2 rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 transition-colors"
+                                onClick={() => {
+                                    const blob = new Blob([blacklistedTracks.join('\n')], { type: 'text/plain' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `blacklisted-tracks-${new Date().toISOString().split('T')[0]}.txt`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                }}
+                            >
+                                Export blacklisted tracks ({blacklistedTracks.length}) ↓
+                            </button>
+                        )}
+                    </div>
                     <ul className="divide-y divide-gray-100">
                         {artists.map((artist, index) => (
                             <li key={index} className="py-2.5 flex items-center flex-wrap space-x-3">
@@ -403,6 +425,7 @@ export default function ScanTracklist() {
                         className="mt-6 w-full rounded-lg bg-[#2563eb] py-3 font-medium text-white hover:bg-[#1d4ed8] transition-colors"
                         onClick={() => {
                             setArtists([]);
+                            setBlacklistedTracks([]);
                             setTrackListInput('');
                             setConfirmTrackList(false);
                             setError(null);
