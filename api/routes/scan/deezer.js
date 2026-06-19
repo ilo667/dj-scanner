@@ -1,6 +1,7 @@
 const { parseArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
 const { formatArtists } = require('../../../utils/format-artists');
+const { getBlacklistedTracks } = require('../../../utils/blacklisted-tracks');
 
 module.exports = async function handleDeezer(req, res) {
     const { url } = req.body;
@@ -17,6 +18,7 @@ module.exports = async function handleDeezer(req, res) {
     }
 
     const artistSet = new Set();
+    const trackLines = [];
     let index = 0;
     const LIMIT = 100;
 
@@ -39,6 +41,8 @@ module.exports = async function handleDeezer(req, res) {
 
                 if (track.title) {
                     parseArtists(track.title).forEach(a => artistSet.add(a));
+                    const mainArtist = track.artist?.name || '';
+                    trackLines.push(mainArtist ? `${mainArtist} - ${track.title}` : track.title);
                 }
             }
 
@@ -52,6 +56,9 @@ module.exports = async function handleDeezer(req, res) {
 
     const artistList = [...artistSet];
     const checkResult = await checkArtists(artistList);
+    const formattedArtists = formatArtists(artistList, checkResult);
+    const blacklisted = formattedArtists.filter(a => a.blacklisted).map(a => a.name);
+    const blacklistedTracks = getBlacklistedTracks(trackLines, blacklisted);
 
-    return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
+    return res.json({ success: true, artists: formattedArtists, blacklistedTracks });
 };

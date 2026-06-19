@@ -1,6 +1,7 @@
 const { parseArtists, separateArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
 const { formatArtists } = require('../../../utils/format-artists');
+const { getBlacklistedTracks } = require('../../../utils/blacklisted-tracks');
 
 async function getSoundCloudClientId() {
     const res = await fetch('https://soundcloud.com/', {
@@ -73,6 +74,7 @@ module.exports = async function handleSoundCloud(req, res) {
         }
 
         const artistSet = new Set();
+        const trackLines = [];
 
         for (const track of fullTracks) {
             if (track.publisher_metadata?.artist) {
@@ -81,13 +83,18 @@ module.exports = async function handleSoundCloud(req, res) {
 
             if (track.title) {
                 parseArtists(track.title).forEach(a => artistSet.add(a));
+                const mainArtist = track.publisher_metadata?.artist || '';
+                trackLines.push(mainArtist ? `${mainArtist} · ${track.title}` : track.title);
             }
         }
 
         const artistList = [...artistSet];
         const checkResult = await checkArtists(artistList);
+        const formattedArtists = formatArtists(artistList, checkResult);
+        const blacklisted = formattedArtists.filter(a => a.blacklisted).map(a => a.name);
+        const blacklistedTracks = getBlacklistedTracks(trackLines, blacklisted);
 
-        return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
+        return res.json({ success: true, artists: formattedArtists, blacklistedTracks });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Failed to fetch SoundCloud playlist' });

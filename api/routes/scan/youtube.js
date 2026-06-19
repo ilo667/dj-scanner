@@ -1,6 +1,7 @@
 const { parseArtists, separateArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
 const { formatArtists } = require('../../../utils/format-artists');
+const { getBlacklistedTracks } = require('../../../utils/blacklisted-tracks');
 
 const MAX_PAGES = 30;
 
@@ -25,6 +26,7 @@ module.exports = async function handleYoutube(req, res) {
 
     const apiKey = process.env.YOUTUBE_API_KEY;
     const artistSet = new Set();
+    const trackLines = [];
     let pageToken = '';
     let pageCount = 0;
 
@@ -61,6 +63,7 @@ module.exports = async function handleYoutube(req, res) {
 
                 // extract additional artists from title (feat, remix, etc.)
                 parseArtists(title).forEach(a => artistSet.add(a));
+                trackLines.push(title);
             }
 
             pageToken = data.nextPageToken || '';
@@ -73,6 +76,9 @@ module.exports = async function handleYoutube(req, res) {
 
     const artistList = [...artistSet];
     const checkResult = await checkArtists(artistList);
+    const formattedArtists = formatArtists(artistList, checkResult);
+    const blacklisted = formattedArtists.filter(a => a.blacklisted).map(a => a.name);
+    const blacklistedTracks = getBlacklistedTracks(trackLines, blacklisted);
 
-    return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
+    return res.json({ success: true, artists: formattedArtists, blacklistedTracks });
 };

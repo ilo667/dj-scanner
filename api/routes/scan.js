@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const { parseArtists } = require('../../utils/parser');
 const { checkArtists } = require('../../utils/artists-check');
 const { formatArtists } = require('../../utils/format-artists');
+const { getBlacklistedTracks } = require('../../utils/blacklisted-tracks');
 const handleYoutube = require('./scan/youtube');
 const handleAppleMusic = require('./scan/apple-music');
 const handleDeezer = require('./scan/deezer');
@@ -34,8 +35,12 @@ router.post('/', scanLimiter, upload.single('file'), async (req, res) => {
 
         const artists = parseArtists(text);
         const checkResult = await checkArtists(artists);
+        const formattedArtists = formatArtists(artists, checkResult);
+        const blacklisted = formattedArtists.filter(a => a.blacklisted).map(a => a.name);
+        const trackLines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        const blacklistedTracks = getBlacklistedTracks(trackLines, blacklisted);
 
-        return res.json({ success: true, artists: formatArtists(artists, checkResult) });
+        return res.json({ success: true, artists: formattedArtists, blacklistedTracks });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to parse input' });

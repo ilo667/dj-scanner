@@ -1,6 +1,7 @@
 const { parseArtists, separateArtists } = require('../../../utils/parser');
 const { checkArtists } = require('../../../utils/artists-check');
 const { formatArtists } = require('../../../utils/format-artists');
+const { getBlacklistedTracks } = require('../../../utils/blacklisted-tracks');
 
 function extractJwt(text) {
     const matches = [...text.matchAll(/eyJ[A-Za-z0-9\-_]+\.eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+/g)];
@@ -81,6 +82,7 @@ module.exports = async function handleAppleMusic(req, res) {
     }
 
     const artistSet = new Set();
+    const trackLines = [];
     let offset = 0;
     const LIMIT = 100;
     let hasMore = true;
@@ -117,6 +119,7 @@ module.exports = async function handleAppleMusic(req, res) {
 
                 if (trackName) {
                     parseArtists(trackName).forEach(a => artistSet.add(a));
+                    trackLines.push(artistName ? `${artistName} - ${trackName}` : trackName);
                 }
             }
 
@@ -130,6 +133,9 @@ module.exports = async function handleAppleMusic(req, res) {
 
     const artistList = [...artistSet];
     const checkResult = await checkArtists(artistList);
+    const formattedArtists = formatArtists(artistList, checkResult);
+    const blacklisted = formattedArtists.filter(a => a.blacklisted).map(a => a.name);
+    const blacklistedTracks = getBlacklistedTracks(trackLines, blacklisted);
 
-    return res.json({ success: true, artists: formatArtists(artistList, checkResult) });
+    return res.json({ success: true, artists: formattedArtists, blacklistedTracks });
 };
