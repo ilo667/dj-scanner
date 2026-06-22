@@ -155,6 +155,20 @@ describe('remix in title', () => {
         assert.ok(result.includes('Artist'));
         assert.ok(result.includes('Remixer'));
     });
+
+    test('Track (Remixer Extended Remix)', () => {
+        const result = parseArtists('Armin van Buuren - What Took You So Long (Yetti Extended Remix)');
+        assert.ok(result.includes('Armin van Buuren'));
+        assert.ok(result.includes('Yetti'));
+        assert.equal(result.filter(a => a === 'Yetti Extended').length, 0);
+    });
+
+    test('Track (Remixer Extended Mix)', () => {
+        const result = parseArtists('Artist - Track (Remixer Extended Mix)');
+        assert.ok(result.includes('Artist'));
+        assert.ok(result.includes('Remixer'));
+        assert.equal(result.filter(a => a === 'Remixer Extended').length, 0);
+    });
 });
 
 describe('CUE format', () => {
