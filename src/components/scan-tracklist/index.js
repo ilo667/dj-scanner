@@ -384,7 +384,7 @@ export default function ScanTracklist() {
                 <div className="bg-gray-200 rounded-2xl shadow-xl p-8">
                     <h2 className="text-lg font-medium text-gray-900 mb-1">Artists found</h2>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
-                        <p className="text-sm text-gray-400 mb-2 sm:mb-0">{artists.length} artists · {artists.filter(a => a.blacklisted).length} flagged</p>
+                        <p className="text-sm text-gray-400 mb-2 sm:mb-0">{artists.length} artists · {artists.filter(a => a.blacklisted).length} blacklisted</p>
                         {blacklistedTracks.length > 0 && (
                             <button
                                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 transition-colors w-full sm:w-auto"
