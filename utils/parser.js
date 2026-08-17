@@ -21,6 +21,7 @@ const DUET_EXCEPTIONS = [
     'Pola & Bryson',
     'ressotto & wcry',
     'T & Sugah',
+    'Toper & 007',
     'Zahharov & Alina Enn',
 ];
 
