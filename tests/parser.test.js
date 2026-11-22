@@ -116,6 +116,24 @@ describe('multiple artists', () => {
         assert.deepEqual(result, ['Sub Focus', 'Wilkinson']);
     });
 
+    test('A x B - Track (collab with x)', () => {
+        const result = parseArtists('Frannabik x Metanoia - The Chest (feat. Kryptomedic)');
+        assert.ok(result.includes('Frannabik'));
+        assert.ok(result.includes('Metanoia'));
+        assert.ok(result.includes('Kryptomedic'));
+        assert.equal(result.filter(a => a === 'Frannabik x Metanoia').length, 0);
+    });
+
+    test('x in artist name not split — X-Mera - Track', () => {
+        const result = parseArtists('X-Mera - Track');
+        assert.deepEqual(result, ['X-Mera']);
+    });
+
+    test('x inside artist name not split — 3xil3 - Track', () => {
+        const result = parseArtists('3xil3 - Track');
+        assert.deepEqual(result, ['3xil3']);
+    });
+
     test('A vs B - Track (without dot)', () => {
         const result = parseArtists('Artist A vs Artist B - Track');
         assert.deepEqual(result, ['Artist A', 'Artist B']);
@@ -414,7 +432,8 @@ describe('Deezer track name patterns', () => {
 
     test('remixer name with X — No Tomorrow (P Money X Whiney Remix)', () => {
         const result = parseArtists('No Tomorrow (P Money X Whiney Remix)');
-        assert.ok(result.includes('P Money X Whiney'));
+        assert.ok(result.includes('P Money'));
+        assert.ok(result.includes('Whiney'));
     });
 
     test('simple feat. — Sleepwalking (feat. Songer)', () => {
